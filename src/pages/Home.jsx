@@ -2,41 +2,80 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 export default function Home() {
+  const opciones = [
+    {
+      to: '/captura',
+      icon: '📸',
+      titulo: 'Capturar Gasto',
+      descripcion: 'Fotografía o manual',
+      color: 'bg-gray-700 hover:bg-gray-800'
+    },
+    {
+      to: '/dashboard',
+      icon: '📊',
+      titulo: 'Dashboard',
+      descripcion: 'Resumen financiero',
+      color: 'bg-orange-600 hover:bg-orange-700'
+    },
+    {
+      to: '/historial',
+      icon: '📋',
+      titulo: 'Historial',
+      descripcion: 'Transacciones',
+      color: 'bg-gray-600 hover:bg-gray-700'
+    },
+    {
+      to: '/metas',
+      icon: '💰',
+      titulo: 'Metas',
+      descripcion: 'Objetivos ahorro',
+      color: 'bg-blue-600 hover:bg-blue-700'
+    },
+    {
+      to: '/reportes',
+      icon: '📄',
+      titulo: 'Reportes',
+      descripcion: 'CSV / PDF',
+      color: 'bg-green-600 hover:bg-green-700'
+    },
+    {
+      to: '/sri',
+      icon: '🏛️',
+      titulo: 'Análisis SRI',
+      descripcion: 'Códigos tributarios',
+      color: 'bg-purple-600 hover:bg-purple-700'
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-md p-8 text-center space-y-6">
-        <div className="text-5xl">💰</div>
+    <div className="min-h-screen bg-gray-100 p-4">
+      <div className="max-w-4xl mx-auto">
         
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">Gasto Tracker</h1>
-          <p className="text-gray-500 text-sm mt-1">Sistema de Inteligencia Financiera</p>
+        {/* HEADER */}
+        <div className="text-center mb-8 mt-4">
+          <div className="text-5xl mb-3">💰</div>
+          <h1 className="text-3xl font-bold text-gray-800">Gasto Tracker</h1>
+          <p className="text-gray-500 text-sm mt-2">Sistema de Inteligencia Financiera</p>
         </div>
 
-        <div className="space-y-2">
-          <Link 
-            to="/captura" 
-            className="w-full bg-gray-700 text-white rounded-lg py-3 font-medium text-center hover:bg-gray-800 transition block"
-          >
-            📸 Capturar Gasto
-          </Link>
-          
-          <Link 
-            to="/dashboard" 
-            className="w-full bg-orange-600 text-white rounded-lg py-3 font-medium text-center hover:bg-orange-700 transition block"
-          >
-            📊 Ver Dashboard
-          </Link>
-          
-          <Link 
-            to="/historial" 
-            className="w-full bg-gray-600 text-white rounded-lg py-3 font-medium text-center hover:bg-gray-700 transition block"
-          >
-            📋 Historial
-          </Link>
+        {/* GRID 2x3 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          {opciones.map((opcion, idx) => (
+            <Link
+              key={idx}
+              to={opcion.to}
+              className={`${opcion.color} text-white rounded-lg p-6 text-center transition transform hover:scale-105 active:scale-95 shadow-md`}
+            >
+              <div className="text-3xl mb-2">{opcion.icon}</div>
+              <h2 className="font-bold text-lg">{opcion.titulo}</h2>
+              <p className="text-xs text-gray-100 mt-1">{opcion.descripcion}</p>
+            </Link>
+          ))}
         </div>
 
-        <div className="border-t border-gray-200 pt-4">
-          <h3 className="text-gray-600 font-medium text-sm">✅ App Desplegada</h3>
+        {/* STATUS */}
+        <div className="bg-white rounded-lg p-4 text-center shadow-md border-t-4 border-green-500">
+          <h3 className="text-gray-700 font-medium">✅ App Desplegada</h3>
           <p className="text-gray-500 text-xs mt-1">Tu aplicación está VIVA en Vercel</p>
           <p className="text-gray-400 text-xs mt-2">Versión: 1.0.0</p>
         </div>
