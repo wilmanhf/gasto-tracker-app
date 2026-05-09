@@ -38,9 +38,19 @@ function App() {
           <Route path="/sri" element={<AnalisisSRI />} />
         </Routes>
 
-        <footer className="app-footer bg-gray-800 text-gray-400 text-center py-4 mt-10 relative">
-          <p>💰 Gasto Tracker v1.0.0-beta | Sistema de Inteligencia Financiera</p>
-          <p className="text-xs mt-1">Desarrollado con React + Supabase + Claude Vision</p>
+        <footer className="app-footer bg-gray-800 text-gray-400 text-center py-6 mt-10 relative">
+          <div className="max-w-6xl mx-auto flex items-center justify-between px-4 mb-4">
+            <div className="flex-1">
+              <img src="/logo-metalpac.jpg" alt="METALPAC" className="h-12 object-contain" />
+            </div>
+            <div className="flex-1 text-center">
+              <p>💰 Gasto Tracker v1.0.0-beta</p>
+              <p className="text-xs mt-1">Sistema de Inteligencia Financiera</p>
+            </div>
+            <div className="flex-1 flex justify-end">
+              <img src="/logo-anta.png" alt="ANTA" className="h-12 object-contain" />
+            </div>
+          </div>
           <p className="text-xs text-gray-300 mt-3 text-center">Diseñado por Wilman Herrera Figueroa</p>
         </footer>
       </div>
