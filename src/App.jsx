@@ -41,7 +41,7 @@ function App() {
         <footer className="app-footer bg-gray-800 text-gray-400 text-center py-4 mt-10 relative">
           <p>💰 Gasto Tracker v1.0.0-beta | Sistema de Inteligencia Financiera</p>
           <p className="text-xs mt-1">Desarrollado con React + Supabase + Claude Vision</p>
-          <p className="absolute bottom-1 right-4 text-xs text-gray-500">Diseñado por Wilman Herrera Figueroa</p>
+          <p className="text-xs text-gray-300 mt-3 text-center">Diseñado por Wilman Herrera Figueroa</p>
         </footer>
       </div>
     </Router>
