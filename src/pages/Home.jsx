@@ -22,7 +22,7 @@ export default function Home() {
       icon: '📋',
       titulo: 'Historial',
       descripcion: 'Transacciones',
-      color: 'bg-gray-600 hover:bg-gray-700'
+      color: 'bg-gray-400 hover:bg-gray-500'
     },
     {
       to: '/metas',
@@ -43,7 +43,7 @@ export default function Home() {
       icon: '🏛️',
       titulo: 'Análisis SRI',
       descripcion: 'Códigos tributarios',
-      color: 'bg-gray-800 hover:bg-gray-900'
+      color: 'bg-gray-400 hover:bg-gray-500'
     }
   ];
 
