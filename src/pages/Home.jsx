@@ -29,14 +29,14 @@ export default function Home() {
       icon: '💰',
       titulo: 'Metas',
       descripcion: 'Objetivos ahorro',
-      color: 'bg-gray-700 hover:bg-gray-800'
+      color: 'bg-orange-600 hover:bg-orange-700'
     },
     {
       to: '/reportes',
       icon: '📄',
       titulo: 'Reportes',
       descripcion: 'CSV / PDF',
-      color: 'bg-orange-500 hover:bg-orange-600'
+      color: 'bg-gray-700 hover:bg-gray-800'
     },
     {
       to: '/sri',
@@ -64,11 +64,13 @@ export default function Home() {
             <Link
               key={idx}
               to={opcion.to}
-              className={`${opcion.color} text-white rounded-lg p-6 text-center transition transform hover:scale-105 active:scale-95 shadow-md`}
+              className={`${opcion.color} text-white rounded-lg p-4 transition transform hover:scale-105 active:scale-95 shadow-md flex items-center gap-3`}
             >
-              <div className="text-lg mb-2">{opcion.icon}</div>
-              <h2 className="font-bold text-base">{opcion.titulo}</h2>
-              <p className="text-xs text-gray-100 mt-1">{opcion.descripcion}</p>
+              <div className="text-2xl flex-shrink-0">{opcion.icon}</div>
+              <div className="text-left min-w-0">
+                <h2 className="font-bold text-sm leading-tight">{opcion.titulo}</h2>
+                <p className="text-xs text-gray-100">{opcion.descripcion}</p>
+              </div>
             </Link>
           ))}
         </div>
