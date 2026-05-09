@@ -54,7 +54,7 @@ export default function Home() {
         {/* HEADER */}
         <div className="text-center mb-8 mt-4">
           <div className="text-8xl mb-6">💰</div>
-          <h1 className="text-3xl font-bold text-gray-800">Gasto Tracker</h1>
+          <h1 className="text-5xl font-bold text-gray-800">Gasto Tracker</h1>
           <p className="text-gray-500 text-sm mt-2">Sistema de Inteligencia Financiera</p>
         </div>
 
@@ -68,8 +68,8 @@ export default function Home() {
             >
               <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center text-3xl">{opcion.icon}</div>
               <div className="text-left min-w-0">
-                <h2 className="font-bold text-sm leading-tight">{opcion.titulo}</h2>
-                <p className="text-xs text-gray-100">{opcion.descripcion}</p>
+                <h2 className="font-bold text-base leading-tight">{opcion.titulo}</h2>
+                <p className="text-sm text-gray-100">{opcion.descripcion}</p>
               </div>
             </Link>
           ))}
