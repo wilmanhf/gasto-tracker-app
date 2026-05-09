@@ -1,7 +1,18 @@
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  font-size: 16px; /* Previene auto-zoom en iPhone */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 .app {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%;
 }
 
 .nav-logo {
@@ -9,6 +20,7 @@
   font-weight: bold;
   color: white;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .nav-links {
@@ -18,4 +30,187 @@
 
 .app-footer {
   position: relative;
+  margin-top: auto;
+  padding-bottom: max(1rem, env(safe-area-inset-bottom)); /* Home indicator */
+}
+
+/* ============================================
+   iPhone 15 Pro Max OPTIMIZADO (390-430px)
+   ============================================ */
+@media (max-width: 430px) {
+  html, body {
+    font-size: 16px; /* NO CAMBIAR - evita auto-zoom */
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+  }
+
+  .app {
+    padding-top: max(0px, env(safe-area-inset-top)); /* Dynamic Island */
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+
+  nav {
+    padding: 1rem max(1rem, env(safe-area-inset-left)) 1rem max(1rem, env(safe-area-inset-right)) !important;
+    gap: 0.5rem;
+  }
+
+  .nav-logo {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .nav-links {
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scroll en iOS */
+    scroll-behavior: smooth;
+  }
+
+  .nav-links a {
+    padding: 0.6rem 0.8rem;
+    border-radius: 4px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth para 120Hz */
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .nav-links a:active {
+    transform: scale(0.95); /* Feedback táctil */
+  }
+
+  /* BUTTONS - 44x44px mínimo (estándar Apple) */
+  button, [role="button"], input[type="button"], input[type="submit"] {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.75rem 1.5rem !important;
+    font-size: 1rem !important;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  button:active, [role="button"]:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+
+  /* INPUTS - 44px mínimo altura */
+  input, textarea, select {
+    min-height: 44px;
+    padding: 0.75rem 1rem !important;
+    font-size: 1rem !important;
+    width: 100%;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    transition: border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: #ff9500; /* Orange accent */
+    box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.1);
+  }
+
+  /* CARDS y CONTAINERS */
+  .card, [class*="card"], section, [role="main"] {
+    padding: 1.5rem 1rem !important;
+    margin: 0 auto 1.5rem auto !important;
+    max-width: 100%;
+    word-wrap: break-word;
+  }
+
+  /* FOOTER */
+  .app-footer {
+    padding: 1.5rem 1rem max(1.5rem, env(safe-area-inset-bottom)) 1rem !important;
+    text-align: center;
+  }
+
+  .app-footer p {
+    font-size: 0.85rem !important;
+    line-height: 1.5;
+    margin: 0.4rem 0 !important;
+    color: #d1d5db;
+  }
+
+  /* GRÁFICOS - responsive */
+  svg, canvas, .recharts-wrapper {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100%;
+  }
+
+  /* TABLAS - scrollable */
+  table {
+    width: 100%;
+    font-size: 0.9rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ESPACIADO VERTICAL */
+  h1, h2, h3, h4, h5, h6 {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    line-height: 1.3;
+  }
+
+  p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+
+  /* Prevenir zoom accidental */
+  input[type="text"],
+  input[type="email"],
+  input[type="number"],
+  input[type="tel"],
+  textarea,
+  select {
+    font-size: 16px !important; /* Previene auto-zoom al focus */
+  }
+
+  /* OPTIMIZAR PARA 120Hz - transiciones smooth */
+  * {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Desactivar transiciones en scroll para mejor performance */
+  .scrolling * {
+    transition: none !important;
+  }
+
+  /* HOME INDICATOR SPACING */
+  body::after {
+    content: '';
+    display: block;
+    height: env(safe-area-inset-bottom);
+  }
+}
+
+/* Pantallas muy pequeñas (< 380px) */
+@media (max-width: 380px) {
+  .nav-links {
+    gap: 0.3rem;
+    font-size: 0.7rem;
+  }
+
+  button, input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  .card, section {
+    padding: 1rem 0.75rem !important;
+  }
 }
