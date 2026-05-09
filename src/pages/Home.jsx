@@ -22,7 +22,7 @@ export default function Home() {
       icon: '📋',
       titulo: 'Historial',
       descripcion: 'Transacciones',
-      color: 'bg-gray-400 hover:bg-gray-500'
+      color: 'bg-gray-500 hover:bg-gray-600'
     },
     {
       to: '/metas',
@@ -43,7 +43,7 @@ export default function Home() {
       icon: '🏛️',
       titulo: 'Análisis SRI',
       descripcion: 'Códigos tributarios',
-      color: 'bg-gray-400 hover:bg-gray-500'
+      color: 'bg-gray-500 hover:bg-gray-600'
     }
   ];
 
@@ -53,7 +53,7 @@ export default function Home() {
         
         {/* HEADER */}
         <div className="text-center mb-8 mt-4">
-          <div className="text-4xl mb-3">💰</div>
+          <div className="text-3xl mb-3">💰</div>
           <h1 className="text-3xl font-bold text-gray-800">Gasto Tracker</h1>
           <p className="text-gray-500 text-sm mt-2">Sistema de Inteligencia Financiera</p>
         </div>
@@ -66,7 +66,7 @@ export default function Home() {
               to={opcion.to}
               className={`${opcion.color} text-white rounded-lg p-6 text-center transition transform hover:scale-105 active:scale-95 shadow-md`}
             >
-              <div className="text-2xl mb-2">{opcion.icon}</div>
+              <div className="text-lg mb-2">{opcion.icon}</div>
               <h2 className="font-bold text-base">{opcion.titulo}</h2>
               <p className="text-xs text-gray-100 mt-1">{opcion.descripcion}</p>
             </Link>
