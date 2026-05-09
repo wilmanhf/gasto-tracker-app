@@ -53,7 +53,7 @@ export default function Home() {
         
         {/* HEADER */}
         <div className="text-center mb-8 mt-4">
-          <div className="text-3xl mb-3">💰</div>
+          <div className="text-8xl mb-6">💰</div>
           <h1 className="text-3xl font-bold text-gray-800">Gasto Tracker</h1>
           <p className="text-gray-500 text-sm mt-2">Sistema de Inteligencia Financiera</p>
         </div>
