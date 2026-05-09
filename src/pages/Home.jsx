@@ -64,9 +64,9 @@ export default function Home() {
             <Link
               key={idx}
               to={opcion.to}
-              className={`${opcion.color} text-white rounded-lg p-4 transition transform hover:scale-105 active:scale-95 shadow-md flex items-center gap-3`}
+              className={`${opcion.color} text-white rounded-lg p-4 transition transform hover:scale-105 active:scale-95 shadow-md flex items-center gap-2`}
             >
-              <div className="text-2xl flex-shrink-0">{opcion.icon}</div>
+              <div className="text-4xl flex-shrink-0 leading-none">{opcion.icon}</div>
               <div className="text-left min-w-0">
                 <h2 className="font-bold text-sm leading-tight">{opcion.titulo}</h2>
                 <p className="text-xs text-gray-100">{opcion.descripcion}</p>
