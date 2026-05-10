@@ -12,7 +12,7 @@ export function useTransacciones() {
       setLoading(true)
       const { data, error } = await supabase
         .from('transacciones')
-        .select('*, categorias(nombre, icono), proyectos(nombre)')
+        .select('*')
         .order('fecha', { ascending: false })
 
       if (error) throw error
