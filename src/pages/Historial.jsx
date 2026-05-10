@@ -9,9 +9,9 @@ export default function Historial() {
   const transaccionesFiltradas = transacciones.filter(t => {
     const searchLower = filtro.toLowerCase()
     return (
-      t.comercio?.toLowerCase().includes(searchLower) ||
-      t.categorias?.nombre?.toLowerCase().includes(searchLower) ||
-      t.proyectos?.nombre?.toLowerCase().includes(searchLower)
+      t.descripcion?.toLowerCase().includes(searchLower) ||
+      t.categoria?.toLowerCase().includes(searchLower) ||
+      t.proyecto?.toLowerCase().includes(searchLower)
     )
   })
 
@@ -46,7 +46,7 @@ export default function Historial() {
       }}>
         <input
           type="text"
-          placeholder="🔍 Buscar por comercio, categoría, proyecto..."
+          placeholder="🔍 Buscar por descripción, categoría, proyecto..."
           value={filtro}
           onChange={(e) => setFiltro(e.target.value)}
           style={{
@@ -78,32 +78,29 @@ export default function Historial() {
           No hay transacciones registradas
         </p>
       ) : (
-        <div style={{
-          overflowX: 'auto'
-        }}>
+        <div style={{ overflowX: 'auto' }}>
           <table style={{
             width: '100%',
-            borderCollapse: 'collapse'
+            borderCollapse: 'collapse',
+            marginTop: '20px'
           }}>
             <thead>
-              <tr style={{ background: '#f5f5f5' }}>
-                <th style={{ textAlign: 'left', padding: '12px', borderBottom: '2px solid #ddd' }}>Fecha</th>
-                <th style={{ textAlign: 'left', padding: '12px', borderBottom: '2px solid #ddd' }}>Comercio</th>
-                <th style={{ textAlign: 'left', padding: '12px', borderBottom: '2px solid #ddd' }}>Categoría</th>
-                <th style={{ textAlign: 'left', padding: '12px', borderBottom: '2px solid #ddd' }}>Proyecto</th>
-                <th style={{ textAlign: 'right', padding: '12px', borderBottom: '2px solid #ddd' }}>Monto</th>
-                <th style={{ textAlign: 'center', padding: '12px', borderBottom: '2px solid #ddd' }}>Acciones</th>
+              <tr style={{ background: '#f5f5f5', borderBottom: '2px solid #ddd' }}>
+                <th style={{ padding: '12px', textAlign: 'left' }}>📅 Fecha</th>
+                <th style={{ padding: '12px', textAlign: 'left' }}>📝 Descripción</th>
+                <th style={{ padding: '12px', textAlign: 'left' }}>🏷️ Categoría</th>
+                <th style={{ padding: '12px', textAlign: 'left' }}>📂 Proyecto</th>
+                <th style={{ padding: '12px', textAlign: 'right' }}>💰 Monto</th>
+                <th style={{ padding: '12px', textAlign: 'center' }}>❌</th>
               </tr>
             </thead>
             <tbody>
-              {transaccionesOrdenadas.map(t => (
+              {transaccionesOrdenadas.map((t) => (
                 <tr key={t.id} style={{ borderBottom: '1px solid #eee' }}>
-                  <td style={{ padding: '12px' }}>{new Date(t.fecha).toLocaleDateString()}</td>
-                  <td style={{ padding: '12px' }}>{t.comercio}</td>
-                  <td style={{ padding: '12px' }}>
-                    {t.categorias?.icono} {t.categorias?.nombre}
-                  </td>
-                  <td style={{ padding: '12px' }}>{t.proyectos?.nombre}</td>
+                  <td style={{ padding: '12px' }}>{new Date(t.fecha).toLocaleDateString('es-ES')}</td>
+                  <td style={{ padding: '12px' }}>{t.descripcion}</td>
+                  <td style={{ padding: '12px' }}>{t.categoria}</td>
+                  <td style={{ padding: '12px' }}>{t.proyecto}</td>
                   <td style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold' }}>
                     ${t.monto?.toFixed(2)}
                   </td>
