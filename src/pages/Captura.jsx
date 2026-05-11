@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useTransacciones } from '../hooks/useTransacciones'
 import ModalInterceptacion from '../components/ModalInterceptacion'
 
@@ -34,127 +34,42 @@ export default function Captura() {
     alert('✅ Gasto registrado correctamente')
   }
 
-  const colorComprobante = TIPOS_COMPROBANTE.find(t => t.value === tipoComprobante)?.color || '#6B7280'
-
   return (
     <>
       <div style={{ padding: '24px 20px', maxWidth: 430, margin: '0 auto' }}>
-
         <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 24, color: '#111827' }}>
           📸 Capturar Gasto
         </h1>
-
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-
           <div>
             <label style={labelStyle}>Monto ($)</label>
-            <input
-              type="number"
-              inputMode="decimal"
-              value={monto}
-              onChange={(e) => setMonto(e.target.value)}
-              placeholder="0.00"
-              style={{
-                ...inputStyle,
-                fontSize: 32,
-                fontWeight: 800,
-                fontFamily: 'monospace',
-                textAlign: 'right',
-                color: monto ? '#111827' : '#9CA3AF',
-              }}
-            />
+            <input type="number" inputMode="decimal" value={monto} onChange={(e) => setMonto(e.target.value)} placeholder="0.00" style={{ ...inputStyle, fontSize: 32, fontWeight: 800, fontFamily: 'monospace', textAlign: 'right', color: monto ? '#111827' : '#9CA3AF' }} />
           </div>
-
           <div>
             <label style={labelStyle}>Descripción <span style={{ color: '#9CA3AF', fontWeight: 400 }}>(opcional)</span></label>
-            <input
-              type="text"
-              value={descripcion}
-              onChange={(e) => setDescripcion(e.target.value)}
-              placeholder="¿Qué compraste?"
-              style={inputStyle}
-            />
+            <input type="text" value={descripcion} onChange={(e) => setDescripcion(e.target.value)} placeholder="¿Qué compraste?" style={inputStyle} />
           </div>
-
           <div>
             <label style={labelStyle}>Fecha</label>
-            <input
-              type="date"
-              value={fecha}
-              onChange={(e) => setFecha(e.target.value)}
-              style={inputStyle}
-            />
+            <input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} style={inputStyle} />
           </div>
-
           <div>
             <label style={labelStyle}>Tipo de comprobante</label>
             <div style={{ display: 'flex', gap: 8 }}>
               {TIPOS_COMPROBANTE.map(t => (
-                <button
-                  key={t.value}
-                  onClick={() => setTipoComprobante(t.value)}
-                  style={{
-                    flex: 1,
-                    padding: '10px 6px',
-                    borderRadius: 12,
-                    border: `2px solid ${tipoComprobante === t.value ? t.color : '#E5E7EB'}`,
-                    backgroundColor: tipoComprobante === t.value ? t.color + '15' : '#F9FAFB',
-                    cursor: 'pointer',
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: tipoComprobante === t.value ? t.color : '#6B7280',
-                    transition: 'all 0.15s',
-                    textAlign: 'center',
-                    lineHeight: 1.4,
-                  }}
-                >
+                <button key={t.value} onClick={() => setTipoComprobante(t.value)} style={{ flex: 1, padding: '10px 6px', borderRadius: 12, border: `2px solid ${tipoComprobante === t.value ? t.color : '#E5E7EB'}`, backgroundColor: tipoComprobante === t.value ? t.color + '15' : '#F9FAFB', cursor: 'pointer', fontSize: 11, fontWeight: 600, color: tipoComprobante === t.value ? t.color : '#6B7280', transition: 'all 0.15s', textAlign: 'center', lineHeight: 1.4 }}>
                   {t.label}
                 </button>
               ))}
             </div>
           </div>
-
-          <button
-            onClick={handleAbrirModal}
-            disabled={!puedeAbrir}
-            style={{
-              width: '100%',
-              padding: '18px',
-              borderRadius: 16,
-              border: 'none',
-              backgroundColor: puedeAbrir ? '#111827' : '#E5E7EB',
-              color: puedeAbrir ? '#fff' : '#9CA3AF',
-              fontSize: 16,
-              fontWeight: 700,
-              cursor: puedeAbrir ? 'pointer' : 'not-allowed',
-              transition: 'all 0.15s',
-              marginTop: 8,
-            }}
-          >
+          <button onClick={handleAbrirModal} disabled={!puedeAbrir} style={{ width: '100%', padding: '18px', borderRadius: 16, border: 'none', backgroundColor: puedeAbrir ? '#111827' : '#E5E7EB', color: puedeAbrir ? '#fff' : '#9CA3AF', fontSize: 16, fontWeight: 700, cursor: puedeAbrir ? 'pointer' : 'not-allowed', transition: 'all 0.15s', marginTop: 8 }}>
             {puedeAbrir ? 'Continuar →' : 'Ingresa un monto para continuar'}
           </button>
-
-          {puedeAbrir && (
-            <p style={{ textAlign: 'center', fontSize: 12, color: '#9CA3AF', margin: '-10px 0 0' }}>
-              Seleccionarás proyecto y categoría en el siguiente paso
-            </p>
-          )}
-
+          {puedeAbrir && <p style={{ textAlign: 'center', fontSize: 12, color: '#9CA3AF', margin: '-10px 0 0' }}>Seleccionarás proyecto y categoría en el siguiente paso</p>}
         </div>
       </div>
-
-      {modalAbierto && (
-        <ModalInterceptacion
-          transaccion={{
-            monto,
-            descripcion,
-            fecha,
-            tipo_comprobante: tipoComprobante,
-          }}
-          onConfirm={handleConfirmarModal}
-          onClose={() => setModalAbierto(false)}
-        />
-      )}
+      {modalAbierto && (<ModalInterceptacion transaccion={{ monto, descripcion, fecha, tipo_comprobante: tipoComprobante }} onConfirm={handleConfirmarModal} onClose={() => setModalAbierto(false)} />)}
     </>
   )
 }
