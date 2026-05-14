@@ -1,7 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
+import Ayuda from '../components/Ayuda'
 
 export default function Home() {
+  const [ayuda, setAyuda] = useState(false)
   return (
+    <>
     <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', backgroundColor: '#111827', overflow: 'hidden' }}>
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 24px 16px' }}>
@@ -51,5 +54,7 @@ export default function Home() {
       </div>
 
     </div>
+    {ayuda && <Ayuda onClose={() => setAyuda(false)} />}
+  </>
   )
 }
