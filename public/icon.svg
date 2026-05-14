@@ -1,14 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
-  <!-- Fondo gris METALPAC redondeado -->
-  <defs>
-    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#4B5563;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#3A4452;stop-opacity:1" />
-    </linearGradient>
-  </defs>
-  
-  <rect width="192" height="192" fill="url(#bgGradient)" rx="45"/>
-  
-  <!-- Emoji 💰 grande en el centro -->
-  <text x="96" y="140" font-size="140" text-anchor="middle" font-family="Arial, sans-serif">💰</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#111827"/>
+  <path d="M40 61 Q256 36 472 61 L472 272 Q256 460 40 272 Z" fill="#1F2937"/>
+  <path d="M60 82 Q256 58 452 82 L452 266 Q256 432 60 266 Z" fill="#F97316"/>
+  <path d="M82 106 Q256 82 430 106 L430 258 Q256 408 82 258 Z" fill="#EA580C"/>
+  <text x="256" y="272" font-family="Georgia,serif" font-size="180" font-weight="700" fill="#ffffff" text-anchor="middle">GT</text>
+  <rect x="156" y="330" width="200" height="8" rx="4" fill="#F97316" opacity="0.6"/>
+  <text x="256" y="390" font-family="monospace" font-size="48" fill="#9CA3AF" text-anchor="middle" letter-spacing="8">TRACKER</text>
 </svg>
