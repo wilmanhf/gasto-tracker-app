@@ -15,6 +15,7 @@ export default function Historial() {
   const [cargando, setCargando] = useState(true)
   const [filtroProyecto, setFiltroProyecto] = useState('TODOS')
   const [busqueda, setBusqueda] = useState('')
+  const [eliminando, setEliminando] = useState(null)
 
   useEffect(() => { cargarDatos() }, [])
 
@@ -34,6 +35,14 @@ export default function Historial() {
   const getNombreProy = (id) => proyectos.find(p => p.id === id)?.nombre || '—'
   const getNombreCat  = (id) => categorias.find(c => c.id === id)?.nombre || '—'
 
+  const handleEliminar = async (id) => {
+    if (!window.confirm('¿Eliminar este registro?')) return
+    setEliminando(id)
+    const { error } = await supabase.from('transacciones').delete().eq('id', id)
+    if (!error) setTxs(prev => prev.filter(t => t.id !== id))
+    setEliminando(null)
+  }
+
   const filtradas = txs.filter(t => {
     const pNombre = getNombreProy(t.proyecto_id)
     const cNombre = getNombreCat(t.categoria_id)
@@ -45,6 +54,19 @@ export default function Historial() {
   })
 
   const totalFiltrado = filtradas.reduce((s, t) => s + parseFloat(t.monto || 0), 0)
+
+  const pillStyle = (activo, cfg) => ({
+    flexShrink: 0,
+    padding: '6px 14px',
+    borderRadius: 99,
+    border: `2px solid ${activo ? (cfg?.color || '#111827') : '#E5E7EB'}`,
+    backgroundColor: activo ? (cfg?.color || '#111827') : '#fff',
+    color: activo ? '#fff' : '#9CA3AF',
+    fontSize: 12,
+    fontWeight: 700,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  })
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', backgroundColor: '#F3F4F6', overflow: 'hidden' }}>
@@ -63,7 +85,7 @@ export default function Historial() {
       </div>
 
       {/* BÚSQUEDA */}
-      <div style={{ padding: '10px 12px 0', flexShrink: 0, backgroundColor: '#F3F4F6' }}>
+      <div style={{ padding: '10px 12px 0', flexShrink: 0 }}>
         <input
           type="text"
           placeholder="🔍 Buscar descripción o categoría..."
@@ -73,17 +95,16 @@ export default function Historial() {
         />
       </div>
 
-      {/* FILTRO PROYECTOS */}
+      {/* FILTRO PROYECTOS — pills horizontales */}
       <div style={{ display: 'flex', gap: 8, padding: '10px 12px', overflowX: 'auto', flexShrink: 0, scrollbarWidth: 'none' }}>
-        {['TODOS', ...Object.keys(PROYECTOS_CONFIG)].map(p => {
-          const cfg = PROYECTOS_CONFIG[p]
-          const activo = filtroProyecto === p
-          return (
-            <button key={p} onClick={() => setFiltroProyecto(p)} style={{ flexShrink: 0, padding: '6px 14px', borderRadius: 99, border: `2px solid ${activo ? (cfg?.color || '#111827') : '#E5E7EB'}`, backgroundColor: activo ? (cfg?.bg || '#111827') : '#fff', color: activo ? (cfg?.color || '#fff') : '#9CA3AF', fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
-              {cfg ? `${cfg.emoji} ${p}` : '📋 TODOS'}
-            </button>
-          )
-        })}
+        <button onClick={() => setFiltroProyecto('TODOS')} style={pillStyle(filtroProyecto === 'TODOS', null)}>
+          📋 TODOS
+        </button>
+        {Object.entries(PROYECTOS_CONFIG).map(([nombre, cfg]) => (
+          <button key={nombre} onClick={() => setFiltroProyecto(nombre)} style={pillStyle(filtroProyecto === nombre, cfg)}>
+            {cfg.emoji} {nombre}
+          </button>
+        ))}
       </div>
 
       {/* LISTA */}
@@ -92,39 +113,44 @@ export default function Historial() {
           <p style={{ textAlign: 'center', color: '#9CA3AF', fontFamily: 'monospace', marginTop: 40 }}>Cargando...</p>
         ) : filtradas.length === 0 ? (
           <p style={{ textAlign: 'center', color: '#D1D5DB', marginTop: 40, fontSize: 14 }}>Sin transacciones</p>
-        ) : (
-          filtradas.map(t => {
-            const pNombre = getNombreProy(t.proyecto_id)
-            const cNombre = getNombreCat(t.categoria_id)
-            const cfg = PROYECTOS_CONFIG[pNombre] || { emoji: '📋', color: '#6B7280', bg: '#F9FAFB', border: '#E5E7EB' }
-            return (
-              <div key={t.id} style={{ backgroundColor: '#fff', borderRadius: 14, padding: '12px 14px', marginBottom: 8, border: `1.5px solid ${cfg.border}`, display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 38, height: 38, borderRadius: 10, backgroundColor: cfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
-                  {cfg.emoji}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: 13, fontWeight: 700, color: '#111827', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {t.descripcion || cNombre}
-                  </p>
-                  <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>
-                    {cNombre} · {t.fecha}
-                  </p>
-                  {t.es_split && (
-                    <span style={{ fontSize: 9, backgroundColor: '#F3F4F6', color: '#6B7280', borderRadius: 4, padding: '1px 5px', fontFamily: 'monospace' }}>🔀 SPLIT</span>
-                  )}
-                </div>
-                <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <p style={{ fontSize: 16, fontWeight: 900, fontFamily: 'monospace', color: cfg.color, margin: 0 }}>
-                    ${parseFloat(t.monto).toFixed(2)}
-                  </p>
-                  <p style={{ fontSize: 10, color: '#9CA3AF', margin: '2px 0 0', fontFamily: 'monospace' }}>
-                    {t.tipo_comprobante === 'FACTURA_LEGAL' ? '🧾' : t.tipo_comprobante === 'NOTA_VENTA' ? '📄' : '🚫'}
-                  </p>
-                </div>
+        ) : filtradas.map(t => {
+          const pNombre = getNombreProy(t.proyecto_id)
+          const cNombre = getNombreCat(t.categoria_id)
+          const cfg = PROYECTOS_CONFIG[pNombre] || { emoji: '📋', color: '#6B7280', bg: '#F9FAFB', border: '#E5E7EB' }
+          const esEliminando = eliminando === t.id
+          return (
+            <div key={t.id} style={{ backgroundColor: '#fff', borderRadius: 14, padding: '12px 14px', marginBottom: 8, border: `1.5px solid ${cfg.border}`, display: 'flex', alignItems: 'center', gap: 10, opacity: esEliminando ? 0.4 : 1 }}>
+              {/* Icono proyecto */}
+              <div style={{ width: 38, height: 38, borderRadius: 10, backgroundColor: cfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
+                {cfg.emoji}
               </div>
-            )
-          })
-        )}
+              {/* Info */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#111827', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {t.descripcion || cNombre}
+                </p>
+                <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>
+                  {cNombre} · {t.fecha}
+                  {t.es_split && <span style={{ marginLeft: 6, fontSize: 9, backgroundColor: '#F3F4F6', color: '#6B7280', borderRadius: 4, padding: '1px 5px', fontFamily: 'monospace' }}>🔀 SPLIT</span>}
+                </p>
+              </div>
+              {/* Monto */}
+              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                <p style={{ fontSize: 15, fontWeight: 900, fontFamily: 'monospace', color: cfg.color, margin: 0 }}>
+                  ${parseFloat(t.monto).toFixed(2)}
+                </p>
+                <p style={{ fontSize: 11, color: '#9CA3AF', margin: '1px 0 0' }}>
+                  {t.tipo_comprobante === 'FACTURA_LEGAL' ? '🧾' : t.tipo_comprobante === 'NOTA_VENTA' ? '📄' : '🚫'}
+                </p>
+              </div>
+              {/* Eliminar */}
+              <button onClick={() => handleEliminar(t.id)} disabled={esEliminando}
+                style={{ flexShrink: 0, width: 32, height: 32, borderRadius: 8, border: 'none', backgroundColor: '#FEF2F2', color: '#EF4444', fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                🗑️
+              </button>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
