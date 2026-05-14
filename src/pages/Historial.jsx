@@ -19,6 +19,9 @@ export default function Historial() {
   const [busqueda, setBusqueda] = useState('')
   const [eliminando, setEliminando] = useState(null)
   const [detalle, setDetalle] = useState(null)
+  const [editando, setEditando] = useState(false)
+  const [editForm, setEditForm] = useState({})
+  const [guardandoEdit, setGuardandoEdit] = useState(false)
 
   useEffect(() => { cargarDatos() }, [])
 
@@ -37,6 +40,32 @@ export default function Historial() {
 
   const getNombreProy = (id) => proyectos.find(p => p.id === id)?.nombre || '—'
   const getNombreCat  = (id) => categorias.find(c => c.id === id)?.nombre || '—'
+
+  const handleAbrirEditar = (t) => {
+    setEditForm({
+      monto: parseFloat(t.monto).toFixed(2),
+      descripcion: t.descripcion || "",
+      fecha: t.fecha,
+      tipo_comprobante: t.tipo_comprobante || "SIN_DOCUMENTO",
+      proyecto_id: t.proyecto_id || "",
+      categoria_id: t.categoria_id || "",
+    })
+    setEditando(true)
+  }
+
+  const handleGuardarEdit = async () => {
+    setGuardandoEdit(true)
+    const { error } = await supabase.from("transacciones").update({
+      monto: parseFloat(editForm.monto),
+      descripcion: editForm.descripcion,
+      fecha: editForm.fecha,
+      tipo_comprobante: editForm.tipo_comprobante,
+      proyecto_id: editForm.proyecto_id || null,
+      categoria_id: editForm.categoria_id || null,
+    }).eq("id", detalle.id)
+    if (!error) { await cargarDatos(); setEditando(false); setDetalle(null) }
+    setGuardandoEdit(false)
+  }
 
   const handleEliminar = async (id) => {
     if (!window.confirm('¿Eliminar este registro?')) return
