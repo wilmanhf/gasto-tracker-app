@@ -20,7 +20,7 @@ export default function Home() {
 
           {/* METALPAC */}
           <div style={{ flex: 1, backgroundColor: '#1F2937', borderRadius: 18, aspectRatio: '1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 10, border: '1px solid #2563EB40' }}>
-            <img src="/logos/metalpac.jpg" alt="METALPAC" style={{ width: '85%', height: '70%', objectFit: 'contain', borderRadius: 8 }} />
+            <img src="/logos/metalpac.png" alt="METALPAC" style={{ width: '85%', height: '70%', objectFit: 'contain', borderRadius: 8 }} />
             <p style={{ fontSize: 9, fontWeight: 800, color: '#2563EB', margin: '6px 0 0', fontFamily: 'monospace', letterSpacing: '0.1em' }}>METALPAC</p>
           </div>
 
