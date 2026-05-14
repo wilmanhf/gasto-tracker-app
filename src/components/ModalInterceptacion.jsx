@@ -167,7 +167,7 @@ export default function ModalInterceptacion({ transaccion, onConfirm, onClose })
             </div>)}
             <div style={{ padding: 12, borderRadius: 12, backgroundColor: '#FFFBEB', marginBottom: 16, border: '2px solid #FCD34D' }}>
               <p style={{ fontSize: 11, fontFamily: 'monospace', color: '#9CA3AF', margin: '0 0 12px', fontWeight: 700 }}>AGREGAR LÍNEA</p>
-              <input type="number" placeholder="Monto" value={nuevaLinea.monto} onChange={(e) => setNuevaLinea({...nuevaLinea, monto: e.target.value})} style={{ width: '100%', padding: '8px', marginBottom: 8, borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 14 }} />
+              <input type="text" inputMode="decimal" placeholder="Monto" value={nuevaLinea.monto} onChange={(e) => setNuevaLinea({...nuevaLinea, monto: e.target.value})} style={{ width: '100%', padding: '8px', marginBottom: 8, borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 14 }} />
               <select value={nuevaLinea.proyecto_id} onChange={(e) => setNuevaLinea({...nuevaLinea, proyecto_id: e.target.value, categoria_id: ''})} style={{ width: '100%', padding: '8px', marginBottom: 8, borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 14 }}>
                 <option value="">Selecciona proyecto</option>
                 {proyectos.map(p => (<option key={p.id} value={p.id}>{PROYECTO_CONFIG[p.nombre]?.emoji} {p.nombre}</option>))}
@@ -176,6 +176,7 @@ export default function ModalInterceptacion({ transaccion, onConfirm, onClose })
                 <option value="">Selecciona categoría</option>
                 {nuevaLinea.categoriasCarga.map(c => (<option key={c.id} value={c.id}>{c.nombre}</option>))}
               </select>
+              {error && <div style={{ padding: '8px', borderRadius: 8, marginBottom: 8, backgroundColor: '#FEF2F2', color: '#B91C1C', fontSize: 12 }}>❌ {error}</div>}
               <button onClick={agregarLinea} disabled={!puedeAgregarLinea} style={{ width: '100%', padding: '10px', borderRadius: 8, border: 'none', backgroundColor: puedeAgregarLinea ? '#059669' : '#D1D5DB', color: 'white', fontWeight: 600, cursor: puedeAgregarLinea ? 'pointer' : 'not-allowed', fontSize: 14 }}>
                 + Agregar línea
               </button>
