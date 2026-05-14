@@ -138,7 +138,7 @@ export default function Metas() {
                     <p style={{ fontSize: 11, color: cfg.color, margin: '2px 0 0', fontWeight: 600 }}>{cfg.emoji} {pNombre}</p>
                   </div>
                 </div>
-                <button onClick={() => handleEliminar(m.id)} style={{ background: 'none', border: 'none', color: '#D1D5DB', fontSize: 16, cursor: 'pointer' }}>✕</button>
+                <button onClick={() => handleEliminar(m.id)} style={{ background: "none", border: "none", color: "#EF4444", fontSize: 20, fontWeight: 700, cursor: "pointer" }}>✕</button>
               </div>
 
               {/* Montos */}
