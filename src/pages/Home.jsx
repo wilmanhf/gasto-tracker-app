@@ -10,7 +10,8 @@ export default function Home() {
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 24px 16px' }}>
         <p style={{ fontSize: 56, margin: '0 0 6px' }}>💰</p>
         <h1 style={{ fontSize: 30, fontWeight: 900, color: '#fff', margin: 0, letterSpacing: '-0.02em' }}>Gasto Tracker</h1>
-        <p style={{ fontSize: 11, color: '#6B7280', fontFamily: 'monospace', margin: '4px 0 0', letterSpacing: '0.1em' }}>CONTROL FINANCIERO PERSONAL</p>
+        <p style={{ fontSize: 11, color: "#6B7280", fontFamily: "monospace", margin: "4px 0 0", letterSpacing: "0.1em" }}>CONTROL FINANCIERO PERSONAL</p>
+        <button onClick={() => setAyuda(true)} style={{ marginTop: 12, backgroundColor: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 10, color: "#fff", fontSize: 13, padding: "6px 16px", cursor: "pointer" }}>❓ Ayuda</button>
         <div style={{ width: 40, height: 2, backgroundColor: '#F97316', borderRadius: 99, margin: '20px 0' }} />
 
         <div style={{ display: 'flex', gap: 12, width: '100%', maxWidth: 360, justifyContent: 'center' }}>
