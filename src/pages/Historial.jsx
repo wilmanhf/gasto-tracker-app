@@ -197,16 +197,91 @@ export default function Historial() {
                   </div>
                 )}
 
-                {/* Botón eliminar */}
-                <button onClick={() => handleEliminar(detalle.id)} disabled={eliminando === detalle.id}
-                  style={{ width: '100%', marginTop: 20, padding: '14px', borderRadius: 14, border: 'none', backgroundColor: '#FEF2F2', color: '#EF4444', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
-                  🗑️ Eliminar registro
-                </button>
+                <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+                  <button onClick={() => handleAbrirEditar(detalle)}
+                    style={{ flex: 1, padding: '14px', borderRadius: 14, border: 'none', backgroundColor: '#EFF6FF', color: '#2563EB', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                    ✏️ Editar
+                  </button>
+                  <button onClick={() => handleEliminar(detalle.id)} disabled={eliminando === detalle.id}
+                    style={{ flex: 1, padding: '14px', borderRadius: 14, border: 'none', backgroundColor: '#FEF2F2', color: '#EF4444', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                    🗑️ Eliminar
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         )
       })()}
     </div>
+
+      {/* MODAL EDITAR */}
+      {editando && detalle && (() => {
+        const catsFiltradas = categorias.filter(cat => {
+          const proy = proyectos.find(p => p.id === editForm.proyecto_id)
+          return proy ? true : false
+        })
+        return (
+          <div onClick={() => setEditando(false)} style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 60, display: 'flex', alignItems: 'flex-end' }}>
+            <div onClick={e => e.stopPropagation()} style={{ width: '100%', backgroundColor: '#fff', borderRadius: '20px 20px 0 0', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0 6px' }}>
+                <div style={{ width: 36, height: 4, borderRadius: 99, backgroundColor: '#E5E7EB' }} />
+              </div>
+              <div style={{ padding: '0 20px 12px', borderBottom: '1px solid #F3F4F6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <p style={{ fontSize: 16, fontWeight: 900, color: '#111827', margin: 0 }}>✏️ Editar registro</p>
+                <button onClick={() => setEditando(false)} style={{ background: 'none', border: 'none', color: '#9CA3AF', fontSize: 20, cursor: 'pointer' }}>✕</button>
+              </div>
+              <div style={{ overflow: 'auto', flex: 1, padding: '16px 20px 120px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+                {[
+                  { label: 'MONTO ($)', field: 'monto', type: 'text', mode: 'decimal' },
+                  { label: 'DESCRIPCIÓN', field: 'descripcion', type: 'text' },
+                  { label: 'FECHA', field: 'fecha', type: 'date' },
+                ].map(({ label, field, type, mode }) => (
+                  <div key={field}>
+                    <p style={{ fontSize: 10, fontFamily: 'monospace', color: '#9CA3AF', fontWeight: 700, margin: '0 0 6px' }}>{label}</p>
+                    <input type={type} inputMode={mode} value={editForm[field]}
+                      onChange={e => setEditForm(f => ({ ...f, [field]: e.target.value }))}
+                      style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '2px solid #E5E7EB', fontSize: 15, boxSizing: 'border-box', outline: 'none' }} />
+                  </div>
+                ))}
+
+                <div>
+                  <p style={{ fontSize: 10, fontFamily: 'monospace', color: '#9CA3AF', fontWeight: 700, margin: '0 0 6px' }}>COMPROBANTE</p>
+                  <select value={editForm.tipo_comprobante} onChange={e => setEditForm(f => ({ ...f, tipo_comprobante: e.target.value }))}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '2px solid #E5E7EB', fontSize: 15, outline: 'none' }}>
+                    <option value="FACTURA_LEGAL">🧾 Factura Legal</option>
+                    <option value="NOTA_VENTA">📄 Nota de Venta</option>
+                    <option value="SIN_DOCUMENTO">🚫 Sin documento</option>
+                  </select>
+                </div>
+
+                <div>
+                  <p style={{ fontSize: 10, fontFamily: 'monospace', color: '#9CA3AF', fontWeight: 700, margin: '0 0 6px' }}>PROYECTO</p>
+                  <select value={editForm.proyecto_id} onChange={e => setEditForm(f => ({ ...f, proyecto_id: e.target.value, categoria_id: '' }))}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '2px solid #E5E7EB', fontSize: 15, outline: 'none' }}>
+                    <option value="">Selecciona proyecto</option>
+                    {proyectos.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
+                  </select>
+                </div>
+
+                <div>
+                  <p style={{ fontSize: 10, fontFamily: 'monospace', color: '#9CA3AF', fontWeight: 700, margin: '0 0 6px' }}>CATEGORÍA</p>
+                  <select value={editForm.categoria_id} onChange={e => setEditForm(f => ({ ...f, categoria_id: e.target.value }))}
+                    disabled={!editForm.proyecto_id}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '2px solid #E5E7EB', fontSize: 15, outline: 'none', opacity: editForm.proyecto_id ? 1 : 0.5 }}>
+                    <option value="">Selecciona categoría</option>
+                    {categorias.filter(c => c.proyecto_id === editForm.proyecto_id).map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+                  </select>
+                </div>
+
+                <button onClick={handleGuardarEdit} disabled={guardandoEdit}
+                  style={{ width: '100%', padding: '16px', borderRadius: 14, border: 'none', backgroundColor: '#2563EB', color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer', opacity: guardandoEdit ? 0.5 : 1 }}>
+                  {guardandoEdit ? '⏳ Guardando...' : '💾 Guardar cambios'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )
+      })()}
   )
 }
