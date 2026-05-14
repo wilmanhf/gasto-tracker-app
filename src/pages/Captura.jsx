@@ -12,6 +12,8 @@ export default function Captura() {
   const { crearTransaccion } = useTransacciones()
 
   const [monto, setMonto] = useState('')
+  const [montoRaw, setMontoRaw] = useState('')
+  const [montoError, setMontoError] = useState(false)
   const [descripcion, setDescripcion] = useState('')
   const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0])
   const [tipoComprobante, setTipoComprobante] = useState('SIN_DOCUMENTO')
@@ -20,10 +22,25 @@ export default function Captura() {
   const puedeAbrir = monto && parseFloat(monto) > 0
 
   const handleMonto = (e) => {
-    let valor = e.target.value.replace(/[^0-9.]/g, '')
-    const partes = valor.split('.')
-    if (partes.length > 2) valor = partes[0] + '.' + partes[1]
+    const valor = e.target.value.replace(/[^0-9.+\-*/() ]/g, '').replace(',', '.')
+    setMontoRaw(valor)
     setMonto(valor)
+    setMontoError(false)
+  }
+
+  const handleMontoBlur = () => {
+    if (!montoRaw) return
+    if (/[+\-*/]/.test(montoRaw)) {
+      try {
+        const resultado = Function('"use strict"; return (' + montoRaw + ')')()
+        if (typeof resultado === 'number' && isFinite(resultado) && resultado > 0) {
+          const r = (Math.round(resultado * 100) / 100).toString()
+          setMonto(r)
+          setMontoRaw(r)
+          setMontoError(false)
+        } else { setMontoError(true) }
+      } catch { setMontoError(true) }
+    }
   }
 
   const handleAbrirModal = () => {
@@ -34,6 +51,8 @@ export default function Captura() {
   const handleConfirmarModal = async (payload) => {
     await crearTransaccion(payload)
     setMonto('')
+    setMontoRaw('')
+    setMontoError(false)
     setDescripcion('')
     setFecha(new Date().toISOString().split('T')[0])
     setTipoComprobante('SIN_DOCUMENTO')
@@ -50,8 +69,8 @@ export default function Captura() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           <div>
             <label style={labelStyle}>Monto ($)</label>
-            <input type="text" value={monto} onChange={handleMonto} placeholder="0.00" style={{ ...inputStyle, fontSize: 32, fontWeight: 800, fontFamily: 'monospace', textAlign: 'right', color: monto ? '#111827' : '#9CA3AF' }} />
-            <p style={{ fontSize: 11, color: '#9CA3AF', margin: '4px 0 0', fontFamily: 'monospace' }}>Ej: 16.61</p>
+            <input type="text" inputMode="decimal" value={montoRaw} onChange={handleMonto} onBlur={handleMontoBlur} placeholder="0.00" style={{ ...inputStyle, fontSize: 32, fontWeight: 800, fontFamily: 'monospace', textAlign: 'right', color: montoRaw ? (montoError ? '#EF4444' : '#111827') : '#9CA3AF', border: montoError ? '2px solid #EF4444' : '2px solid #E5E7EB' }} />
+            <p style={{ fontSize: 11, color: montoError ? '#EF4444' : '#9CA3AF', margin: '4px 0 0', fontFamily: 'monospace' }}>{montoError ? '❌ Expresión inválida' : 'Ej: 16.61 · También: 12.50+8.30'}</p>
           </div>
           <div>
             <label style={labelStyle}>Descripción <span style={{ color: '#9CA3AF', fontWeight: 400 }}>(opcional)</span></label>
