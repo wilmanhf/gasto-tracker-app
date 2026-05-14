@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useTransacciones } from '../hooks/useTransacciones'
+import BotonVoz from '../components/BotonVoz'
 import ModalInterceptacion from '../components/ModalInterceptacion'
 
 const TIPOS_COMPROBANTE = [
@@ -18,6 +19,11 @@ export default function Captura() {
   const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0])
   const [tipoComprobante, setTipoComprobante] = useState('SIN_DOCUMENTO')
   const [modalAbierto, setModalAbierto] = useState(false)
+
+  const handleVoz = ({ monto: m, descripcion: d }) => {
+    if (m) { setMonto(m); setMontoRaw(m) }
+    if (d) setDescripcion(d)
+  }
 
   const puedeAbrir = monto && parseFloat(monto) > 0
 
@@ -94,6 +100,7 @@ export default function Captura() {
             {puedeAbrir ? 'Continuar →' : 'Ingresa un monto para continuar'}
           </button>
           {puedeAbrir && <p style={{ textAlign: 'center', fontSize: 12, color: '#9CA3AF', margin: '-10px 0 0' }}>Seleccionarás proyecto y categoría en el siguiente paso</p>}
+          <BotonVoz onResultado={handleVoz} />
         </div>
       </div>
       {modalAbierto && (<ModalInterceptacion transaccion={{ monto, descripcion, fecha, tipo_comprobante: tipoComprobante }} onConfirm={handleConfirmarModal} onClose={() => setModalAbierto(false)} />)}
