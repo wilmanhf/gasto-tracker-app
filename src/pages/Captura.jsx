@@ -19,6 +19,14 @@ export default function Captura() {
 
   const puedeAbrir = monto && parseFloat(monto) > 0
 
+  const handleMonto = (e) => {
+    let valor = e.target.value
+    valor = valor.replace(/[^0-9.]/g, '')
+    const partes = valor.split('.')
+    if (partes.length > 2) valor = partes[0] + '.' + partes.slice(1).join('')
+    setMonto(valor)
+  }
+
   const handleAbrirModal = () => {
     if (!puedeAbrir) return
     setModalAbierto(true)
@@ -43,7 +51,7 @@ export default function Captura() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           <div>
             <label style={labelStyle}>Monto ($)</label>
-            <input type="number" step="0.01" inputMode="decimal" value={monto} onChange={(e) => setMonto(e.target.value)} placeholder="0.00" style={{ ...inputStyle, fontSize: 32, fontWeight: 800, fontFamily: 'monospace', textAlign: 'right', color: monto ? '#111827' : '#9CA3AF' }} />
+            <input type="text" inputMode="decimal" value={monto} onChange={handleMonto} placeholder="0.00" style={{ ...inputStyle, fontSize: 32, fontWeight: 800, fontFamily: 'monospace', textAlign: 'right', color: monto ? '#111827' : '#9CA3AF' }} />
           </div>
           <div>
             <label style={labelStyle}>Descripción <span style={{ color: '#9CA3AF', fontWeight: 400 }}>(opcional)</span></label>
