@@ -166,12 +166,12 @@ export default function Metas() {
                   <p style={{ fontSize: 13, fontWeight: 700, color: '#059669', margin: 0 }}>✅ ¡Meta alcanzada!</p>
                 </div>
               ) : (
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <input type="text" inputMode="decimal" placeholder="Abono $" value={abonoInput}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <input type="text" inputMode="decimal" placeholder="Ingresa monto a abonar..." value={abonoInput}
                     onChange={e => setAbonoInput(e.target.value.replace(',', '.'))}
-                    style={{ flex: 1, padding: "12px 14px", borderRadius: 10, border: "2px solid #E5E7EB", fontSize: 16, fontFamily: "monospace", outline: "none", minWidth: 0 }} />
+                    style={{ width: '100%', padding: '14px 16px', borderRadius: 12, border: `2px solid ${cfg.border}`, fontSize: 18, fontFamily: 'monospace', outline: 'none', boxSizing: 'border-box', backgroundColor: cfg.bg }} />
                   <button onClick={() => { if (abonoInput && parseFloat(abonoInput) > 0) { handleAbonar(m, abonoInput); setAbonoInput('') } }}
-                    style={{ padding: '8px 14px', borderRadius: 10, border: 'none', backgroundColor: cfg.color, color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                    style={{ width: '100%', padding: '12px', borderRadius: 12, border: 'none', backgroundColor: cfg.color, color: '#fff', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>
                     + Abonar
                   </button>
                 </div>
