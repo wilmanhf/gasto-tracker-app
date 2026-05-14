@@ -58,7 +58,7 @@ export default function ModalInterceptacion({ transaccion, onConfirm, onClose })
       setError(`Monto máximo: $${montoPendiente.toFixed(2)}`)
       return
     }
-    setLineas([...lineas, { monto: monto.toFixed(2), proyecto_id: nuevaLinea.proyecto_id, categoria_id: nuevaLinea.categoria_id }])
+    setLineas([...lineas, { user_id: '00000000-0000-0000-0000-000000000001', monto: monto.toFixed(2), proyecto_id: nuevaLinea.proyecto_id, categoria_id: nuevaLinea.categoria_id }])
     setNuevaLinea({ monto: '', proyecto_id: '', categoria_id: '', categoriasCarga: [] })
     setError(null)
   }
