@@ -1,141 +1,130 @@
-import React, { useState } from 'react'
-import { useTransacciones } from '../hooks/useTransacciones'
+import React, { useState, useEffect } from 'react'
+import { supabase } from '../config/supabaseClient'
+
+const PROYECTOS_CONFIG = {
+  'ANTA':       { emoji: '🔥', color: '#EA580C', bg: '#FFF7ED', border: '#FDBA74' },
+  'METALPAC':   { emoji: '⚙️', color: '#2563EB', bg: '#EFF6FF', border: '#93C5FD' },
+  'CASA NUEVA': { emoji: '🏠', color: '#D97706', bg: '#FFFBEB', border: '#FCD34D' },
+  'PERSONAL':   { emoji: '👤', color: '#059669', bg: '#ECFDF5', border: '#6EE7B7' },
+}
 
 export default function Historial() {
-  const { transacciones, loading, eliminarTransaccion } = useTransacciones()
-  const [filtro, setFiltro] = useState('')
-  const [sortBy, setSortBy] = useState('fecha')
+  const [txs, setTxs] = useState([])
+  const [proyectos, setProyectos] = useState([])
+  const [categorias, setCategorias] = useState([])
+  const [cargando, setCargando] = useState(true)
+  const [filtroProyecto, setFiltroProyecto] = useState('TODOS')
+  const [busqueda, setBusqueda] = useState('')
 
-  const transaccionesFiltradas = transacciones.filter(t => {
-    const searchLower = filtro.toLowerCase()
-    return (
-      t.descripcion?.toLowerCase().includes(searchLower) ||
-      t.categoria?.toLowerCase().includes(searchLower) ||
-      t.proyecto?.toLowerCase().includes(searchLower)
-    )
-  })
+  useEffect(() => { cargarDatos() }, [])
 
-  const transaccionesOrdenadas = [...transaccionesFiltradas].sort((a, b) => {
-    if (sortBy === 'fecha') return new Date(b.fecha) - new Date(a.fecha)
-    if (sortBy === 'monto') return b.monto - a.monto
-    return 0
-  })
-
-  const handleEliminar = async (id) => {
-    if (confirm('¿Eliminar esta transacción?')) {
-      try {
-        await eliminarTransaccion(id)
-        alert('✅ Transacción eliminada')
-      } catch (error) {
-        alert('❌ Error: ' + error.message)
-      }
-    }
+  const cargarDatos = async () => {
+    setCargando(true)
+    const [{ data: p }, { data: c }, { data: t }] = await Promise.all([
+      supabase.from('proyectos').select('id, nombre'),
+      supabase.from('categorias').select('id, nombre'),
+      supabase.from('transacciones').select('*').order('fecha', { ascending: false })
+    ])
+    setProyectos(p || [])
+    setCategorias(c || [])
+    setTxs(t || [])
+    setCargando(false)
   }
 
-  return (
-    <div style={{ maxWidth: '900px', margin: '40px auto', padding: '20px' }}>
-      <h1>💾 Historial de Transacciones</h1>
-      <p style={{ color: '#666' }}>Todas tus transacciones registradas</p>
+  const getNombreProy = (id) => proyectos.find(p => p.id === id)?.nombre || '—'
+  const getNombreCat  = (id) => categorias.find(c => c.id === id)?.nombre || '—'
 
-      {/* Filtros */}
-      <div style={{
-        display: 'flex',
-        gap: '10px',
-        marginBottom: '20px',
-        flexWrap: 'wrap'
-      }}>
-        <input
-          type="text"
-          placeholder="🔍 Buscar por descripción, categoría, proyecto..."
-          value={filtro}
-          onChange={(e) => setFiltro(e.target.value)}
-          style={{
-            flex: 1,
-            minWidth: '200px',
-            padding: '10px',
-            borderRadius: '5px',
-            border: '1px solid #ddd'
-          }}
-        />
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-          style={{
-            padding: '10px',
-            borderRadius: '5px',
-            border: '1px solid #ddd'
-          }}
-        >
-          <option value="fecha">📅 Por fecha</option>
-          <option value="monto">💰 Por monto</option>
-        </select>
+  const filtradas = txs.filter(t => {
+    const pNombre = getNombreProy(t.proyecto_id)
+    const cNombre = getNombreCat(t.categoria_id)
+    const matchProy = filtroProyecto === 'TODOS' || pNombre === filtroProyecto
+    const matchBusq = !busqueda ||
+      (t.descripcion || '').toLowerCase().includes(busqueda.toLowerCase()) ||
+      cNombre.toLowerCase().includes(busqueda.toLowerCase())
+    return matchProy && matchBusq
+  })
+
+  const totalFiltrado = filtradas.reduce((s, t) => s + parseFloat(t.monto || 0), 0)
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', backgroundColor: '#F3F4F6', overflow: 'hidden' }}>
+
+      {/* HEADER */}
+      <div style={{ backgroundColor: '#111827', padding: '14px 20px 12px', flexShrink: 0 }}>
+        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 10, fontFamily: 'monospace', margin: 0 }}>HISTORIAL</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <p style={{ color: '#fff', fontSize: 22, fontWeight: 900, fontFamily: 'monospace', margin: '2px 0 0' }}>
+            {filtradas.length} registros
+          </p>
+          <p style={{ color: '#F97316', fontSize: 20, fontWeight: 900, fontFamily: 'monospace', margin: 0 }}>
+            ${totalFiltrado.toFixed(2)}
+          </p>
+        </div>
       </div>
 
-      {loading ? (
-        <p>⏳ Cargando...</p>
-      ) : transaccionesOrdenadas.length === 0 ? (
-        <p style={{ color: '#999', textAlign: 'center', padding: '40px' }}>
-          No hay transacciones registradas
-        </p>
-      ) : (
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{
-            width: '100%',
-            borderCollapse: 'collapse',
-            marginTop: '20px'
-          }}>
-            <thead>
-              <tr style={{ background: '#f5f5f5', borderBottom: '2px solid #ddd' }}>
-                <th style={{ padding: '12px', textAlign: 'left' }}>📅 Fecha</th>
-                <th style={{ padding: '12px', textAlign: 'left' }}>📝 Descripción</th>
-                <th style={{ padding: '12px', textAlign: 'left' }}>🏷️ Categoría</th>
-                <th style={{ padding: '12px', textAlign: 'left' }}>📂 Proyecto</th>
-                <th style={{ padding: '12px', textAlign: 'right' }}>💰 Monto</th>
-                <th style={{ padding: '12px', textAlign: 'center' }}>❌</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transaccionesOrdenadas.map((t) => (
-                <tr key={t.id} style={{ borderBottom: '1px solid #eee' }}>
-                  <td style={{ padding: '12px' }}>{new Date(t.fecha).toLocaleDateString('es-ES')}</td>
-                  <td style={{ padding: '12px' }}>{t.descripcion}</td>
-                  <td style={{ padding: '12px' }}>{t.categoria}</td>
-                  <td style={{ padding: '12px' }}>{t.proyecto}</td>
-                  <td style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold' }}>
-                    ${t.monto?.toFixed(2)}
-                  </td>
-                  <td style={{ padding: '12px', textAlign: 'center' }}>
-                    <button
-                      onClick={() => handleEliminar(t.id)}
-                      style={{
-                        padding: '5px 10px',
-                        background: '#ff6b6b',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '3px',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      🗑️
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {/* BÚSQUEDA */}
+      <div style={{ padding: '10px 12px 0', flexShrink: 0, backgroundColor: '#F3F4F6' }}>
+        <input
+          type="text"
+          placeholder="🔍 Buscar descripción o categoría..."
+          value={busqueda}
+          onChange={e => setBusqueda(e.target.value)}
+          style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '2px solid #E5E7EB', fontSize: 14, backgroundColor: '#fff', boxSizing: 'border-box', outline: 'none' }}
+        />
+      </div>
 
-      {/* Info */}
-      <div style={{
-        marginTop: '30px',
-        padding: '20px',
-        background: '#e3f2fd',
-        borderRadius: '10px'
-      }}>
-        <h3>ℹ️ Información</h3>
-        <p>Total registrado: <strong>${transacciones.reduce((s, t) => s + (t.monto || 0), 0).toFixed(2)}</strong></p>
-        <p>Transacciones: <strong>{transacciones.length}</strong></p>
+      {/* FILTRO PROYECTOS */}
+      <div style={{ display: 'flex', gap: 8, padding: '10px 12px', overflowX: 'auto', flexShrink: 0, scrollbarWidth: 'none' }}>
+        {['TODOS', ...Object.keys(PROYECTOS_CONFIG)].map(p => {
+          const cfg = PROYECTOS_CONFIG[p]
+          const activo = filtroProyecto === p
+          return (
+            <button key={p} onClick={() => setFiltroProyecto(p)} style={{ flexShrink: 0, padding: '6px 14px', borderRadius: 99, border: `2px solid ${activo ? (cfg?.color || '#111827') : '#E5E7EB'}`, backgroundColor: activo ? (cfg?.bg || '#111827') : '#fff', color: activo ? (cfg?.color || '#fff') : '#9CA3AF', fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              {cfg ? `${cfg.emoji} ${p}` : '📋 TODOS'}
+            </button>
+          )
+        })}
+      </div>
+
+      {/* LISTA */}
+      <div style={{ flex: 1, overflow: 'auto', padding: '0 12px 16px' }}>
+        {cargando ? (
+          <p style={{ textAlign: 'center', color: '#9CA3AF', fontFamily: 'monospace', marginTop: 40 }}>Cargando...</p>
+        ) : filtradas.length === 0 ? (
+          <p style={{ textAlign: 'center', color: '#D1D5DB', marginTop: 40, fontSize: 14 }}>Sin transacciones</p>
+        ) : (
+          filtradas.map(t => {
+            const pNombre = getNombreProy(t.proyecto_id)
+            const cNombre = getNombreCat(t.categoria_id)
+            const cfg = PROYECTOS_CONFIG[pNombre] || { emoji: '📋', color: '#6B7280', bg: '#F9FAFB', border: '#E5E7EB' }
+            return (
+              <div key={t.id} style={{ backgroundColor: '#fff', borderRadius: 14, padding: '12px 14px', marginBottom: 8, border: `1.5px solid ${cfg.border}`, display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 38, height: 38, borderRadius: 10, backgroundColor: cfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
+                  {cfg.emoji}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: '#111827', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {t.descripcion || cNombre}
+                  </p>
+                  <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>
+                    {cNombre} · {t.fecha}
+                  </p>
+                  {t.es_split && (
+                    <span style={{ fontSize: 9, backgroundColor: '#F3F4F6', color: '#6B7280', borderRadius: 4, padding: '1px 5px', fontFamily: 'monospace' }}>🔀 SPLIT</span>
+                  )}
+                </div>
+                <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                  <p style={{ fontSize: 16, fontWeight: 900, fontFamily: 'monospace', color: cfg.color, margin: 0 }}>
+                    ${parseFloat(t.monto).toFixed(2)}
+                  </p>
+                  <p style={{ fontSize: 10, color: '#9CA3AF', margin: '2px 0 0', fontFamily: 'monospace' }}>
+                    {t.tipo_comprobante === 'FACTURA_LEGAL' ? '🧾' : t.tipo_comprobante === 'NOTA_VENTA' ? '📄' : '🚫'}
+                  </p>
+                </div>
+              </div>
+            )
+          })
+        )}
       </div>
     </div>
   )
