@@ -51,7 +51,7 @@ export default function Captura() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           <div>
             <label style={labelStyle}>Monto ($)</label>
-            <input type="text" inputMode="decimal" value={monto} onChange={handleMonto} placeholder="0.00" style={{ ...inputStyle, fontSize: 32, fontWeight: 800, fontFamily: 'monospace', textAlign: 'right', color: monto ? '#111827' : '#9CA3AF' }} />
+            <input type="text" inputMode="numeric" value={monto} onChange={handleMonto} placeholder="0.00" style={{ ...inputStyle, fontSize: 32, fontWeight: 800, fontFamily: 'monospace', textAlign: 'right', color: monto ? '#111827' : '#9CA3AF' }} />
           </div>
           <div>
             <label style={labelStyle}>Descripción <span style={{ color: '#9CA3AF', fontWeight: 400 }}>(opcional)</span></label>
