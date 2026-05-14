@@ -3,18 +3,18 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 import { supabase } from '../config/supabaseClient'
 
 const PROYECTOS = [
-  { nombre: 'ANTA',      emoji: '🔥', color: '#EA580C', bg: '#FFF7ED', border: '#FDBA74' },
-  { nombre: 'METALPAC',  emoji: '⚙️', color: '#2563EB', bg: '#EFF6FF', border: '#93C5FD' },
-  { nombre: 'CASA NUEVA',emoji: '🏠', color: '#D97706', bg: '#FFFBEB', border: '#FCD34D' },
-  { nombre: 'PERSONAL',  emoji: '👤', color: '#059669', bg: '#ECFDF5', border: '#6EE7B7' },
+  { nombre: 'ANTA',       emoji: '🔥', color: '#EA580C', bg: '#FFF7ED', border: '#FDBA74' },
+  { nombre: 'METALPAC',   emoji: '⚙️', color: '#2563EB', bg: '#EFF6FF', border: '#93C5FD' },
+  { nombre: 'CASA NUEVA', emoji: '🏠', color: '#D97706', bg: '#FFFBEB', border: '#FCD34D' },
+  { nombre: 'PERSONAL',   emoji: '👤', color: '#059669', bg: '#ECFDF5', border: '#6EE7B7' },
 ]
 
-const COLORES_CAT = ['#EA580C','#2563EB','#059669','#D97706','#7C3AED','#0EA5E9','#F43F5E']
+const COLORES = ['#EA580C','#2563EB','#059669','#D97706','#7C3AED','#0EA5E9','#F43F5E']
 
 export default function Dashboard() {
-  const [tabIdx, setTabIdx] = useState(0)
   const [datos, setDatos] = useState({})
   const [cargando, setCargando] = useState(true)
+  const [detalle, setDetalle] = useState(null)
 
   useEffect(() => { cargarDatos() }, [])
 
@@ -24,7 +24,6 @@ export default function Dashboard() {
       const { data: proyectos } = await supabase.from('proyectos').select('id, nombre')
       const { data: categorias } = await supabase.from('categorias').select('id, nombre, proyecto_id')
       const { data: txs } = await supabase.from('transacciones').select('*').eq('tipo', 'GASTO')
-
       const resultado = {}
       for (const p of proyectos) {
         const txProy = txs.filter(t => t.proyecto_id === p.id)
@@ -38,15 +37,13 @@ export default function Dashboard() {
         const porCategoria = Object.entries(catMap)
           .map(([name, value]) => ({ name, value: parseFloat(value.toFixed(2)) }))
           .sort((a, b) => b.value - a.value)
-          .slice(0, 5)
-
         resultado[p.nombre] = {
           total: parseFloat(total.toFixed(2)),
           count: txProy.length,
           porCategoria,
           recientes: txProy
             .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
-            .slice(0, 3)
+            .slice(0, 5)
             .map(t => ({
               monto: parseFloat(t.monto),
               fecha: t.fecha,
@@ -60,99 +57,122 @@ export default function Dashboard() {
     finally { setCargando(false) }
   }
 
-  const proy = PROYECTOS[tabIdx]
-  const d = datos[proy.nombre] || { total: 0, count: 0, porCategoria: [], recientes: [] }
+  const totalGlobal = Object.values(datos).reduce((s, d) => s + (d?.total || 0), 0)
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', backgroundColor: '#F9FAFB', overflow: 'hidden' }}>
-
-      {/* HEADER */}
-      <div style={{ backgroundColor: proy.color, padding: '14px 20px 10px', flexShrink: 0 }}>
-        <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 10, fontFamily: 'monospace', margin: 0, letterSpacing: '0.1em' }}>DASHBOARD</p>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', backgroundColor: '#F3F4F6', overflow: 'hidden' }}>
+      <div style={{ backgroundColor: '#111827', padding: '14px 20px 12px', flexShrink: 0 }}>
+        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 10, fontFamily: 'monospace', margin: 0 }}>RESUMEN TOTAL</p>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h1 style={{ color: '#fff', fontSize: 20, fontWeight: 900, margin: '2px 0 0' }}>{proy.emoji} {proy.nombre}</h1>
-          <button onClick={cargarDatos} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: 8, color: '#fff', fontSize: 12, padding: '4px 10px', cursor: 'pointer' }}>↺</button>
+          <p style={{ color: '#fff', fontSize: 28, fontWeight: 900, fontFamily: 'monospace', margin: '2px 0 0' }}>${totalGlobal.toFixed(2)}</p>
+          <button onClick={cargarDatos} style={{ background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: 8, color: '#fff', fontSize: 13, padding: '5px 12px', cursor: 'pointer' }}>↺</button>
         </div>
       </div>
-
-      {/* TABS */}
-      <div style={{ display: 'flex', backgroundColor: '#fff', borderBottom: '1px solid #E5E7EB', flexShrink: 0 }}>
-        {PROYECTOS.map((p, i) => (
-          <button key={p.nombre} onClick={() => setTabIdx(i)} style={{ flex: 1, padding: '10px 0', border: 'none', backgroundColor: 'transparent', cursor: 'pointer', fontSize: 18, borderBottom: tabIdx === i ? `3px solid ${p.color}` : '3px solid transparent', transition: 'all 0.15s' }}>
-            {p.emoji}
-          </button>
-        ))}
-      </div>
-
       {cargando ? (
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <p style={{ color: '#9CA3AF', fontFamily: 'monospace', fontSize: 13 }}>Cargando...</p>
+          <p style={{ color: '#9CA3AF', fontFamily: 'monospace' }}>Cargando...</p>
         </div>
       ) : (
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '12px 16px', gap: 10, overflow: 'hidden' }}>
-
-          {/* KPI */}
-          <div style={{ display: 'flex', gap: 10, flexShrink: 0 }}>
-            <div style={{ flex: 1, backgroundColor: '#fff', borderRadius: 14, padding: '12px 14px', border: `2px solid ${proy.border}` }}>
-              <p style={{ fontSize: 10, color: '#9CA3AF', fontFamily: 'monospace', margin: 0, fontWeight: 700 }}>TOTAL GASTADO</p>
-              <p style={{ fontSize: 26, fontWeight: 900, fontFamily: 'monospace', color: proy.color, margin: '2px 0 0' }}>${d.total.toFixed(2)}</p>
-            </div>
-            <div style={{ backgroundColor: '#fff', borderRadius: 14, padding: '12px 14px', border: '2px solid #E5E7EB', minWidth: 70, textAlign: 'center' }}>
-              <p style={{ fontSize: 10, color: '#9CA3AF', fontFamily: 'monospace', margin: 0, fontWeight: 700 }}>REGISTROS</p>
-              <p style={{ fontSize: 26, fontWeight: 900, color: '#374151', margin: '2px 0 0' }}>{d.count}</p>
-            </div>
-          </div>
-
-          {/* CONTENIDO PRINCIPAL: gráfico + categorías */}
-          <div style={{ display: 'flex', gap: 10, flex: 1, minHeight: 0 }}>
-
-            {/* PIE CHART */}
-            <div style={{ flex: 1, backgroundColor: '#fff', borderRadius: 14, padding: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-              {d.porCategoria.length > 0 ? (
-                <>
-                  <p style={{ fontSize: 10, color: '#9CA3AF', fontFamily: 'monospace', margin: '0 0 4px', fontWeight: 700, alignSelf: 'flex-start' }}>POR CATEGORÍA</p>
-                  <ResponsiveContainer width="100%" height={130}>
-                    <PieChart>
-                      <Pie data={d.porCategoria} cx="50%" cy="50%" innerRadius={30} outerRadius={55} dataKey="value" paddingAngle={3}>
-                        {d.porCategoria.map((_, i) => <Cell key={i} fill={COLORES_CAT[i % COLORES_CAT.length]} />)}
-                      </Pie>
-                      <Tooltip formatter={(v) => `$${v.toFixed(2)}`} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <div style={{ width: '100%' }}>
-                    {d.porCategoria.map((c, i) => (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-                        <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: COLORES_CAT[i % COLORES_CAT.length], flexShrink: 0 }} />
-                        <span style={{ fontSize: 10, color: '#6B7280', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
-                        <span style={{ fontSize: 10, fontWeight: 700, color: '#111827', fontFamily: 'monospace' }}>${c.value.toFixed(0)}</span>
-                      </div>
-                    ))}
+        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: 10, padding: 10, overflow: 'hidden' }}>
+          {PROYECTOS.map(p => {
+            const d = datos[p.nombre] || { total: 0, count: 0, porCategoria: [] }
+            const pct = totalGlobal > 0 ? ((d.total / totalGlobal) * 100).toFixed(0) : 0
+            return (
+              <div key={p.nombre} onClick={() => setDetalle(p.nombre)}
+                style={{ backgroundColor: '#fff', borderRadius: 16, padding: '12px', border: `2px solid ${p.border}`, cursor: 'pointer', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
+                  <div>
+                    <p style={{ fontSize: 18, margin: 0 }}>{p.emoji}</p>
+                    <p style={{ fontSize: 10, fontWeight: 800, color: p.color, margin: '2px 0 0', fontFamily: 'monospace' }}>{p.nombre}</p>
                   </div>
-                </>
-              ) : (
-                <p style={{ color: '#D1D5DB', fontSize: 12, textAlign: 'center' }}>Sin datos aún</p>
-              )}
-            </div>
-
-            {/* RECIENTES */}
-            <div style={{ flex: 1, backgroundColor: '#fff', borderRadius: 14, padding: '10px', display: 'flex', flexDirection: 'column' }}>
-              <p style={{ fontSize: 10, color: '#9CA3AF', fontFamily: 'monospace', margin: '0 0 8px', fontWeight: 700 }}>RECIENTES</p>
-              {d.recientes.length > 0 ? d.recientes.map((t, i) => (
-                <div key={i} style={{ paddingBottom: 8, marginBottom: 8, borderBottom: i < d.recientes.length - 1 ? '1px solid #F3F4F6' : 'none' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <span style={{ fontSize: 11, color: '#374151', fontWeight: 600, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginRight: 6 }}>{t.desc}</span>
-                    <span style={{ fontSize: 12, fontWeight: 800, fontFamily: 'monospace', color: proy.color, flexShrink: 0 }}>${t.monto.toFixed(2)}</span>
+                  <div style={{ textAlign: 'right' }}>
+                    <p style={{ fontSize: 9, color: '#9CA3AF', margin: 0, fontFamily: 'monospace' }}>{pct}% total</p>
+                    <p style={{ fontSize: 8, color: '#D1D5DB', margin: '1px 0 0', fontFamily: 'monospace' }}>{d.count} reg.</p>
                   </div>
-                  <span style={{ fontSize: 10, color: '#9CA3AF' }}>{t.cat} · {t.fecha}</span>
                 </div>
-              )) : (
-                <p style={{ color: '#D1D5DB', fontSize: 12, textAlign: 'center', marginTop: 20 }}>Sin registros</p>
-              )}
-            </div>
-          </div>
-
+                <p style={{ fontSize: 20, fontWeight: 900, fontFamily: 'monospace', color: '#111827', margin: '0 0 4px' }}>${d.total.toFixed(2)}</p>
+                {d.porCategoria.length > 0 ? (
+                  <div style={{ flex: 1, minHeight: 0 }}>
+                    <ResponsiveContainer width="100%" height={70}>
+                      <PieChart>
+                        <Pie data={d.porCategoria} cx="50%" cy="50%" innerRadius={18} outerRadius={32} dataKey="value" paddingAngle={2}>
+                          {d.porCategoria.map((_, i) => <Cell key={i} fill={COLORES[i % COLORES.length]} />)}
+                        </Pie>
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <p style={{ fontSize: 9, color: '#9CA3AF', textAlign: 'center', margin: 0 }}>tap para detalle</p>
+                  </div>
+                ) : (
+                  <p style={{ fontSize: 10, color: '#D1D5DB', textAlign: 'center', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: 0 }}>Sin registros</p>
+                )}
+              </div>
+            )
+          })}
         </div>
       )}
+      {detalle && (() => {
+        const p = PROYECTOS.find(x => x.nombre === detalle)
+        const d = datos[detalle] || { total: 0, count: 0, porCategoria: [], recientes: [] }
+        return (
+          <div onClick={() => setDetalle(null)} style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end' }}>
+            <div onClick={e => e.stopPropagation()} style={{ width: '100%', backgroundColor: '#fff', borderRadius: '20px 20px 0 0', maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0 8px' }}>
+                <div style={{ width: 36, height: 4, borderRadius: 99, backgroundColor: '#E5E7EB' }} />
+              </div>
+              <div style={{ padding: '0 20px 16px', borderBottom: '1px solid #F3F4F6' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <p style={{ fontSize: 22, margin: 0 }}>{p.emoji}</p>
+                    <p style={{ fontSize: 18, fontWeight: 900, color: p.color, margin: '2px 0 0' }}>{p.nombre}</p>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <p style={{ fontSize: 28, fontWeight: 900, fontFamily: 'monospace', color: '#111827', margin: 0 }}>${d.total.toFixed(2)}</p>
+                    <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>{d.count} transacciones</p>
+                  </div>
+                </div>
+              </div>
+              <div style={{ overflow: 'auto', flex: 1, padding: '16px 20px 32px' }}>
+                {d.porCategoria.length > 0 && (
+                  <>
+                    <p style={{ fontSize: 10, fontFamily: 'monospace', color: '#9CA3AF', fontWeight: 700, margin: '0 0 8px' }}>POR CATEGORÍA</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                      <div style={{ flexShrink: 0 }}>
+                        <ResponsiveContainer width={110} height={110}>
+                          <PieChart>
+                            <Pie data={d.porCategoria} cx="50%" cy="50%" innerRadius={28} outerRadius={50} dataKey="value" paddingAngle={3}>
+                              {d.porCategoria.map((_, i) => <Cell key={i} fill={COLORES[i % COLORES.length]} />)}
+                            </Pie>
+                            <Tooltip formatter={v => `$${v.toFixed(2)}`} />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        {d.porCategoria.map((c, i) => (
+                          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
+                            <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: COLORES[i % COLORES.length], flexShrink: 0 }} />
+                            <span style={{ fontSize: 11, color: '#374151', flex: 1 }}>{c.name}</span>
+                            <span style={{ fontSize: 11, fontWeight: 700, fontFamily: 'monospace' }}>${c.value.toFixed(2)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+                <p style={{ fontSize: 10, fontFamily: 'monospace', color: '#9CA3AF', fontWeight: 700, margin: '0 0 10px' }}>ÚLTIMAS TRANSACCIONES</p>
+                {d.recientes.length > 0 ? d.recientes.map((t, i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #F3F4F6' }}>
+                    <div>
+                      <p style={{ fontSize: 13, fontWeight: 600, color: '#111827', margin: 0 }}>{t.desc}</p>
+                      <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>{t.cat} · {t.fecha}</p>
+                    </div>
+                    <p style={{ fontSize: 15, fontWeight: 800, fontFamily: 'monospace', color: p.color, margin: 0 }}>${t.monto.toFixed(2)}</p>
+                  </div>
+                )) : <p style={{ color: '#D1D5DB', fontSize: 13 }}>Sin transacciones</p>}
+              </div>
+            </div>
+          </div>
+        )
+      })()}
     </div>
   )
 }
