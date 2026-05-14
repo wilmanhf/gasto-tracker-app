@@ -19,6 +19,7 @@ export default function Metas() {
   const [mostrarForm, setMostrarForm] = useState(false)
   const [guardando, setGuardando] = useState(false)
   const [abonos, setAbonos] = useState({})
+  const [traspasosPendientes, setTraspasosPendientes] = useState({})
 
   const [form, setForm] = useState({
     nombre: '', descripcion: '', monto_objetivo: '',
@@ -68,10 +69,25 @@ export default function Metas() {
   }
 
   const handleAbonar = async (meta, monto) => {
-    const nuevo = Math.min(parseFloat(meta.monto_actual) + parseFloat(monto), parseFloat(meta.monto_objetivo))
+    const montoNum = parseFloat(monto)
+    const nuevo = Math.min(parseFloat(meta.monto_actual) + montoNum, parseFloat(meta.monto_objetivo))
     const estado = nuevo >= parseFloat(meta.monto_objetivo) ? 'completada' : 'activa'
     await supabase.from('metas_ahorro').update({ monto_actual: nuevo, estado, updated_at: new Date().toISOString() }).eq('id', meta.id)
+    await supabase.from('traspasos_ahorro').insert([{
+      meta_id: meta.id,
+      monto: montoNum,
+      fecha: new Date().toISOString().split('T')[0],
+      estado: 'pendiente',
+      descripcion: 'Transferir a Jardín Azuayo cta. 2518653'
+    }])
+    setTraspasosPendientes(prev => ({ ...prev, [meta.id]: { monto: montoNum, metaNombre: meta.nombre } }))
     await cargarDatos()
+  }
+
+  const handleConfirmarTraspaso = async (metaId) => {
+    await supabase.from('traspasos_ahorro').update({ estado: 'completado' })
+      .eq('meta_id', metaId).eq('estado', 'pendiente')
+    setTraspasosPendientes(prev => { const n = {...prev}; delete n[metaId]; return n })
   }
 
   const handleEliminar = async (id) => {
@@ -160,6 +176,18 @@ export default function Metas() {
                 {!completada && <span style={{ fontSize: 11, color: '#9CA3AF', fontFamily: 'monospace' }}>Falta ${falta.toFixed(2)}</span>}
               </div>
 
+              {/* Banner traspaso pendiente */}
+              {traspasosPendientes[m.id] && (
+                <div style={{ padding: '12px 14px', borderRadius: 12, backgroundColor: '#FFF7ED', border: '2px solid #FDBA74', marginBottom: 8 }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: '#EA580C', margin: '0 0 4px' }}>💸 Recuerda transferir</p>
+                  <p style={{ fontSize: 16, fontWeight: 900, fontFamily: 'monospace', color: '#111827', margin: '0 0 2px' }}>${traspasosPendientes[m.id].monto.toFixed(2)}</p>
+                  <p style={{ fontSize: 11, color: '#9CA3AF', margin: '0 0 10px' }}>Jardín Azuayo · Cta. 2518653</p>
+                  <button onClick={() => handleConfirmarTraspaso(m.id)}
+                    style={{ width: '100%', padding: '10px', borderRadius: 10, border: 'none', backgroundColor: '#059669', color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                    ✅ Ya transferí
+                  </button>
+                </div>
+              )}
               {/* Completada o abono */}
               {completada ? (
                 <div style={{ textAlign: 'center', padding: '8px', backgroundColor: '#ECFDF5', borderRadius: 10 }}>
