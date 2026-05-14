@@ -169,7 +169,7 @@ export default function Metas() {
                 <div style={{ display: 'flex', gap: 8 }}>
                   <input type="text" inputMode="decimal" placeholder="Abono $" value={abonoInput}
                     onChange={e => setAbonoInput(e.target.value.replace(',', '.'))}
-                    style={{ flex: 1, padding: '8px 12px', borderRadius: 10, border: '2px solid #E5E7EB', fontSize: 14, fontFamily: 'monospace', outline: 'none' }} />
+                    style={{ flex: 1, padding: "12px 14px", borderRadius: 10, border: "2px solid #E5E7EB", fontSize: 16, fontFamily: "monospace", outline: "none", minWidth: 0 }} />
                   <button onClick={() => { if (abonoInput && parseFloat(abonoInput) > 0) { handleAbonar(m, abonoInput); setAbonoInput('') } }}
                     style={{ padding: '8px 14px', borderRadius: 10, border: 'none', backgroundColor: cfg.color, color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
                     + Abonar
