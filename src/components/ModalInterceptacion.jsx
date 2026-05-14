@@ -53,7 +53,7 @@ export default function ModalInterceptacion({ transaccion, onConfirm, onClose })
       setError('Completa todos los campos de la línea')
       return
     }
-    const monto = parseFloat(nuevaLinea.monto)
+    const monto = parseFloat(nuevaLinea.monto.replace(",", "."))
     if (monto > montoPendiente) {
       setError(`Monto máximo: $${montoPendiente.toFixed(2)}`)
       return
