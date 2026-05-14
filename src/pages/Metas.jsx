@@ -56,6 +56,7 @@ export default function Metas() {
       fecha_inicio: new Date().toISOString().split('T')[0],
       fecha_meta_estimada: form.fecha_meta_estimada || null,
     }])
+    if (error) { alert("Error: " + error.message); setGuardando(false); return; }
     if (!error) {
       await cargarDatos()
       setMostrarForm(false)
