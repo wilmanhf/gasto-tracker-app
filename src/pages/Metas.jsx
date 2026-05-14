@@ -191,7 +191,7 @@ export default function Metas() {
               <p style={{ fontSize: 16, fontWeight: 900, color: '#111827', margin: 0 }}>Nueva Meta</p>
               <button onClick={() => setMostrarForm(false)} style={{ background: 'none', border: 'none', color: '#9CA3AF', fontSize: 20, cursor: 'pointer' }}>✕</button>
             </div>
-            <div style={{ overflow: 'auto', flex: 1, padding: '16px 20px 32px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ overflow: 'auto', flex: 1, padding: "16px 20px 100px", display: 'flex', flexDirection: 'column', gap: 14 }}>
 
               {/* Icono selector */}
               <div>
