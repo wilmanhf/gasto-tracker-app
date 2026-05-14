@@ -29,7 +29,7 @@ export default function Historial() {
     setCargando(true)
     const [{ data: p }, { data: c }, { data: t }] = await Promise.all([
       supabase.from('proyectos').select('id, nombre'),
-      supabase.from('categorias').select('id, nombre'),
+      supabase.from('categorias').select('id, nombre, proyecto_id'),
       supabase.from('transacciones').select('*').order('fecha', { ascending: false })
     ])
     setProyectos(p || [])
@@ -44,26 +44,30 @@ export default function Historial() {
   const handleAbrirEditar = (t) => {
     setEditForm({
       monto: parseFloat(t.monto).toFixed(2),
-      descripcion: t.descripcion || "",
+      descripcion: t.descripcion || '',
       fecha: t.fecha,
-      tipo_comprobante: t.tipo_comprobante || "SIN_DOCUMENTO",
-      proyecto_id: t.proyecto_id || "",
-      categoria_id: t.categoria_id || "",
+      tipo_comprobante: t.tipo_comprobante || 'SIN_DOCUMENTO',
+      proyecto_id: t.proyecto_id || '',
+      categoria_id: t.categoria_id || '',
     })
     setEditando(true)
   }
 
   const handleGuardarEdit = async () => {
     setGuardandoEdit(true)
-    const { error } = await supabase.from("transacciones").update({
+    const { error } = await supabase.from('transacciones').update({
       monto: parseFloat(editForm.monto),
       descripcion: editForm.descripcion,
       fecha: editForm.fecha,
       tipo_comprobante: editForm.tipo_comprobante,
       proyecto_id: editForm.proyecto_id || null,
       categoria_id: editForm.categoria_id || null,
-    }).eq("id", detalle.id)
-    if (!error) { await cargarDatos(); setEditando(false); setDetalle(null) }
+    }).eq('id', detalle.id)
+    if (!error) {
+      await cargarDatos()
+      setEditando(false)
+      setDetalle(null)
+    }
     setGuardandoEdit(false)
   }
 
@@ -91,17 +95,16 @@ export default function Historial() {
   const totalFiltrado = filtradas.reduce((s, t) => s + parseFloat(t.monto || 0), 0)
 
   const pillStyle = (activo, color) => ({
-    flexShrink: 0, padding: "6px 14px", borderRadius: 99, flexShrink: 0,
+    flex: 1, padding: '8px 0', borderRadius: 10,
     border: `2px solid ${activo ? color : '#E5E7EB'}`,
     backgroundColor: activo ? color : '#fff',
     color: activo ? '#fff' : '#9CA3AF',
-    fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap',
+    fontSize: 16, cursor: 'pointer',
   })
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', backgroundColor: '#F3F4F6', overflow: 'hidden' }}>
 
-      {/* HEADER */}
       <div style={{ backgroundColor: '#111827', padding: '14px 20px 12px', flexShrink: 0 }}>
         <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 10, fontFamily: 'monospace', margin: 0 }}>HISTORIAL</p>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -110,24 +113,20 @@ export default function Historial() {
         </div>
       </div>
 
-      {/* BÚSQUEDA */}
       <div style={{ padding: '10px 12px 0', flexShrink: 0 }}>
         <input type="text" placeholder="🔍 Buscar descripción o categoría..." value={busqueda}
           onChange={e => setBusqueda(e.target.value)}
           style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '2px solid #E5E7EB', fontSize: 14, backgroundColor: '#fff', boxSizing: 'border-box', outline: 'none' }} />
       </div>
 
-      {/* FILTRO PILLS */}
       <div style={{ display: 'flex', gap: 6, padding: '10px 12px', flexShrink: 0 }}>
         {[{nombre:'TODOS', emoji:'📋', color:'#111827'}, ...Object.entries(PROYECTOS_CONFIG).map(([nombre,cfg])=>({nombre,...cfg}))].map(p => (
-          <button key={p.nombre} onClick={() => setFiltroProyecto(p.nombre)}
-            style={{ flex: 1, padding: '8px 0', borderRadius: 10, border: `2px solid ${filtroProyecto===p.nombre ? p.color : '#E5E7EB'}`, backgroundColor: filtroProyecto===p.nombre ? p.color : '#fff', color: filtroProyecto===p.nombre ? '#fff' : '#9CA3AF', fontSize: 16, cursor: 'pointer' }}>
+          <button key={p.nombre} onClick={() => setFiltroProyecto(p.nombre)} style={pillStyle(filtroProyecto === p.nombre, p.color)}>
             {p.emoji}
           </button>
         ))}
       </div>
 
-      {/* LISTA */}
       <div style={{ flex: 1, overflow: 'auto', padding: '0 12px 16px' }}>
         {cargando ? (
           <p style={{ textAlign: 'center', color: '#9CA3AF', fontFamily: 'monospace', marginTop: 40 }}>Cargando...</p>
@@ -161,156 +160,128 @@ export default function Historial() {
       </div>
 
       {/* MODAL DETALLE */}
-      {detalle && (() => {
-        const pNombre = getNombreProy(detalle.proyecto_id)
-        const cNombre = getNombreCat(detalle.categoria_id)
-        const cfg = PROYECTOS_CONFIG[pNombre] || { emoji: '📋', color: '#6B7280', bg: '#F9FAFB', border: '#E5E7EB' }
-        const lineas = detalle.lineas || []
-        return (
-          <div onClick={() => setDetalle(null)} style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end' }}>
-            <div onClick={e => e.stopPropagation()} style={{ width: '100%', backgroundColor: '#fff', borderRadius: '20px 20px 0 0', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
-              {/* Handle */}
-              <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0 6px' }}>
-                <div style={{ width: 36, height: 4, borderRadius: 99, backgroundColor: '#E5E7EB' }} />
-              </div>
-              {/* Header */}
-              <div style={{ padding: '0 20px 14px', borderBottom: '1px solid #F3F4F6' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div>
-                    <p style={{ fontSize: 11, fontFamily: 'monospace', color: '#9CA3AF', margin: 0 }}>DETALLE DE GASTO</p>
-                    <p style={{ fontSize: 20, fontWeight: 900, color: detalle.es_split ? '#6B7280' : cfg.color, margin: '4px 0 0' }}>
-                      {detalle.es_split ? '🔀 Split' : `${cfg.emoji} ${pNombre}`}
-                    </p>
-                  </div>
-                  <p style={{ fontSize: 28, fontWeight: 900, fontFamily: 'monospace', color: '#111827', margin: 0 }}>
-                    ${parseFloat(detalle.monto).toFixed(2)}
+      {detalle && !editando && (
+        <div onClick={() => setDetalle(null)} style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'flex-end' }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: '100%', backgroundColor: '#fff', borderRadius: '20px 20px 0 0', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0 6px' }}>
+              <div style={{ width: 36, height: 4, borderRadius: 99, backgroundColor: '#E5E7EB' }} />
+            </div>
+            <div style={{ padding: '0 20px 14px', borderBottom: '1px solid #F3F4F6' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <p style={{ fontSize: 11, fontFamily: 'monospace', color: '#9CA3AF', margin: 0 }}>DETALLE DE GASTO</p>
+                  <p style={{ fontSize: 20, fontWeight: 900, color: '#6B7280', margin: '4px 0 0' }}>
+                    {detalle.es_split ? '🔀 Split' : `${PROYECTOS_CONFIG[getNombreProy(detalle.proyecto_id)]?.emoji || '📋'} ${getNombreProy(detalle.proyecto_id)}`}
                   </p>
                 </div>
-              </div>
-              {/* Contenido */}
-              <div style={{ overflow: 'auto', flex: 1, padding: "16px 20px 120px" }}>
-
-                {/* Campos comunes */}
-                {[
-                  { label: 'FECHA', value: detalle.fecha },
-                  { label: 'COMPROBANTE', value: COMPROBANTE[detalle.tipo_comprobante] || detalle.tipo_comprobante },
-                  detalle.descripcion && { label: 'DESCRIPCIÓN', value: detalle.descripcion },
-                  !detalle.es_split && { label: 'CATEGORÍA', value: cNombre },
-                  !detalle.es_split && { label: 'PROYECTO', value: `${cfg.emoji} ${pNombre}` },
-                ].filter(Boolean).map((f, i) => (
-                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #F3F4F6' }}>
-                    <span style={{ fontSize: 10, fontFamily: 'monospace', color: '#9CA3AF', fontWeight: 700 }}>{f.label}</span>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>{f.value}</span>
-                  </div>
-                ))}
-
-                {/* Líneas del split */}
-                {detalle.es_split && lineas.length > 0 && (
-                  <div style={{ marginTop: 12 }}>
-                    <p style={{ fontSize: 10, fontFamily: 'monospace', color: '#9CA3AF', fontWeight: 700, margin: '0 0 10px' }}>LÍNEAS ({lineas.length})</p>
-                    {lineas.map((l, i) => {
-                      const lPNombre = getNombreProy(l.proyecto_id)
-                      const lCNombre = getNombreCat(l.categoria_id)
-                      const lCfg = PROYECTOS_CONFIG[lPNombre] || { emoji: '📋', color: '#6B7280', bg: '#F9FAFB', border: '#E5E7EB' }
-                      return (
-                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 12, backgroundColor: lCfg.bg, border: `1.5px solid ${lCfg.border}`, marginBottom: 8 }}>
-                          <span style={{ fontSize: 20 }}>{lCfg.emoji}</span>
-                          <div style={{ flex: 1 }}>
-                            <p style={{ fontSize: 12, fontWeight: 700, color: lCfg.color, margin: 0 }}>{lPNombre}</p>
-                            <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>{lCNombre}</p>
-                          </div>
-                          <p style={{ fontSize: 16, fontWeight: 900, fontFamily: 'monospace', color: '#111827', margin: 0 }}>${parseFloat(l.monto).toFixed(2)}</p>
-                        </div>
-                      )
-                    })}
-                  </div>
-                )}
-
-                <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
-                  <button onClick={() => handleAbrirEditar(detalle)}
-                    style={{ flex: 1, padding: '14px', borderRadius: 14, border: 'none', backgroundColor: '#EFF6FF', color: '#2563EB', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
-                    ✏️ Editar
-                  </button>
-                  <button onClick={() => handleEliminar(detalle.id)} disabled={eliminando === detalle.id}
-                    style={{ flex: 1, padding: '14px', borderRadius: 14, border: 'none', backgroundColor: '#FEF2F2', color: '#EF4444', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
-                    🗑️ Eliminar
-                  </button>
-                </div>
+                <p style={{ fontSize: 28, fontWeight: 900, fontFamily: 'monospace', color: '#111827', margin: 0 }}>${parseFloat(detalle.monto).toFixed(2)}</p>
               </div>
             </div>
-          </div>
-        )
-      })()}
-    </div>
-
-      {/* MODAL EDITAR */}
-      {editando && detalle && (() => {
-        const catsFiltradas = categorias.filter(cat => {
-          const proy = proyectos.find(p => p.id === editForm.proyecto_id)
-          return proy ? true : false
-        })
-        return (
-          <div onClick={() => setEditando(false)} style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 60, display: 'flex', alignItems: 'flex-end' }}>
-            <div onClick={e => e.stopPropagation()} style={{ width: '100%', backgroundColor: '#fff', borderRadius: '20px 20px 0 0', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0 6px' }}>
-                <div style={{ width: 36, height: 4, borderRadius: 99, backgroundColor: '#E5E7EB' }} />
-              </div>
-              <div style={{ padding: '0 20px 12px', borderBottom: '1px solid #F3F4F6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <p style={{ fontSize: 16, fontWeight: 900, color: '#111827', margin: 0 }}>✏️ Editar registro</p>
-                <button onClick={() => setEditando(false)} style={{ background: 'none', border: 'none', color: '#9CA3AF', fontSize: 20, cursor: 'pointer' }}>✕</button>
-              </div>
-              <div style={{ overflow: 'auto', flex: 1, padding: '16px 20px 120px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-
-                {[
-                  { label: 'MONTO ($)', field: 'monto', type: 'text', mode: 'decimal' },
-                  { label: 'DESCRIPCIÓN', field: 'descripcion', type: 'text' },
-                  { label: 'FECHA', field: 'fecha', type: 'date' },
-                ].map(({ label, field, type, mode }) => (
-                  <div key={field}>
-                    <p style={{ fontSize: 10, fontFamily: 'monospace', color: '#9CA3AF', fontWeight: 700, margin: '0 0 6px' }}>{label}</p>
-                    <input type={type} inputMode={mode} value={editForm[field]}
-                      onChange={e => setEditForm(f => ({ ...f, [field]: e.target.value }))}
-                      style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '2px solid #E5E7EB', fontSize: 15, boxSizing: 'border-box', outline: 'none' }} />
-                  </div>
-                ))}
-
-                <div>
-                  <p style={{ fontSize: 10, fontFamily: 'monospace', color: '#9CA3AF', fontWeight: 700, margin: '0 0 6px' }}>COMPROBANTE</p>
-                  <select value={editForm.tipo_comprobante} onChange={e => setEditForm(f => ({ ...f, tipo_comprobante: e.target.value }))}
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '2px solid #E5E7EB', fontSize: 15, outline: 'none' }}>
-                    <option value="FACTURA_LEGAL">🧾 Factura Legal</option>
-                    <option value="NOTA_VENTA">📄 Nota de Venta</option>
-                    <option value="SIN_DOCUMENTO">🚫 Sin documento</option>
-                  </select>
+            <div style={{ overflow: 'auto', flex: 1, padding: '16px 20px 120px' }}>
+              {[
+                { label: 'FECHA', value: detalle.fecha },
+                { label: 'COMPROBANTE', value: COMPROBANTE[detalle.tipo_comprobante] || detalle.tipo_comprobante },
+                detalle.descripcion && { label: 'DESCRIPCIÓN', value: detalle.descripcion },
+                !detalle.es_split && { label: 'CATEGORÍA', value: getNombreCat(detalle.categoria_id) },
+                !detalle.es_split && { label: 'PROYECTO', value: getNombreProy(detalle.proyecto_id) },
+              ].filter(Boolean).map((f, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #F3F4F6' }}>
+                  <span style={{ fontSize: 10, fontFamily: 'monospace', color: '#9CA3AF', fontWeight: 700 }}>{f.label}</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>{f.value}</span>
                 </div>
-
-                <div>
-                  <p style={{ fontSize: 10, fontFamily: 'monospace', color: '#9CA3AF', fontWeight: 700, margin: '0 0 6px' }}>PROYECTO</p>
-                  <select value={editForm.proyecto_id} onChange={e => setEditForm(f => ({ ...f, proyecto_id: e.target.value, categoria_id: '' }))}
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '2px solid #E5E7EB', fontSize: 15, outline: 'none' }}>
-                    <option value="">Selecciona proyecto</option>
-                    {proyectos.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
-                  </select>
+              ))}
+              {detalle.es_split && (detalle.lineas || []).length > 0 && (
+                <div style={{ marginTop: 12 }}>
+                  <p style={{ fontSize: 10, fontFamily: 'monospace', color: '#9CA3AF', fontWeight: 700, margin: '0 0 10px' }}>LÍNEAS ({detalle.lineas.length})</p>
+                  {detalle.lineas.map((l, i) => {
+                    const lPNombre = getNombreProy(l.proyecto_id)
+                    const lCfg = PROYECTOS_CONFIG[lPNombre] || { emoji: '📋', color: '#6B7280', bg: '#F9FAFB', border: '#E5E7EB' }
+                    return (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 12, backgroundColor: lCfg.bg, border: `1.5px solid ${lCfg.border}`, marginBottom: 8 }}>
+                        <span style={{ fontSize: 20 }}>{lCfg.emoji}</span>
+                        <div style={{ flex: 1 }}>
+                          <p style={{ fontSize: 12, fontWeight: 700, color: lCfg.color, margin: 0 }}>{lPNombre}</p>
+                          <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>{getNombreCat(l.categoria_id)}</p>
+                        </div>
+                        <p style={{ fontSize: 16, fontWeight: 900, fontFamily: 'monospace', color: '#111827', margin: 0 }}>${parseFloat(l.monto).toFixed(2)}</p>
+                      </div>
+                    )
+                  })}
                 </div>
-
-                <div>
-                  <p style={{ fontSize: 10, fontFamily: 'monospace', color: '#9CA3AF', fontWeight: 700, margin: '0 0 6px' }}>CATEGORÍA</p>
-                  <select value={editForm.categoria_id} onChange={e => setEditForm(f => ({ ...f, categoria_id: e.target.value }))}
-                    disabled={!editForm.proyecto_id}
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '2px solid #E5E7EB', fontSize: 15, outline: 'none', opacity: editForm.proyecto_id ? 1 : 0.5 }}>
-                    <option value="">Selecciona categoría</option>
-                    {categorias.filter(c => c.proyecto_id === editForm.proyecto_id).map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
-                  </select>
-                </div>
-
-                <button onClick={handleGuardarEdit} disabled={guardandoEdit}
-                  style={{ width: '100%', padding: '16px', borderRadius: 14, border: 'none', backgroundColor: '#2563EB', color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer', opacity: guardandoEdit ? 0.5 : 1 }}>
-                  {guardandoEdit ? '⏳ Guardando...' : '💾 Guardar cambios'}
+              )}
+              <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+                <button onClick={() => handleAbrirEditar(detalle)}
+                  style={{ flex: 1, padding: '14px', borderRadius: 14, border: 'none', backgroundColor: '#EFF6FF', color: '#2563EB', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                  ✏️ Editar
+                </button>
+                <button onClick={() => handleEliminar(detalle.id)} disabled={eliminando === detalle.id}
+                  style={{ flex: 1, padding: '14px', borderRadius: 14, border: 'none', backgroundColor: '#FEF2F2', color: '#EF4444', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                  🗑️ Eliminar
                 </button>
               </div>
             </div>
           </div>
-        )
-      })()}
+        </div>
+      )}
+
+      {/* MODAL EDITAR */}
+      {editando && detalle && (
+        <div onClick={() => setEditando(false)} style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 60, display: 'flex', alignItems: 'flex-end' }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: '100%', backgroundColor: '#fff', borderRadius: '20px 20px 0 0', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0 6px' }}>
+              <div style={{ width: 36, height: 4, borderRadius: 99, backgroundColor: '#E5E7EB' }} />
+            </div>
+            <div style={{ padding: '0 20px 12px', borderBottom: '1px solid #F3F4F6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <p style={{ fontSize: 16, fontWeight: 900, color: '#111827', margin: 0 }}>✏️ Editar registro</p>
+              <button onClick={() => setEditando(false)} style={{ background: 'none', border: 'none', color: '#9CA3AF', fontSize: 20, cursor: 'pointer' }}>✕</button>
+            </div>
+            <div style={{ overflow: 'auto', flex: 1, padding: '16px 20px 120px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {[
+                { label: 'MONTO ($)', field: 'monto', type: 'text', mode: 'decimal' },
+                { label: 'DESCRIPCIÓN', field: 'descripcion', type: 'text' },
+                { label: 'FECHA', field: 'fecha', type: 'date' },
+              ].map(({ label, field, type, mode }) => (
+                <div key={field}>
+                  <p style={{ fontSize: 10, fontFamily: 'monospace', color: '#9CA3AF', fontWeight: 700, margin: '0 0 6px' }}>{label}</p>
+                  <input type={type} inputMode={mode} value={editForm[field]}
+                    onChange={e => setEditForm(f => ({ ...f, [field]: e.target.value }))}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '2px solid #E5E7EB', fontSize: 15, boxSizing: 'border-box', outline: 'none' }} />
+                </div>
+              ))}
+              <div>
+                <p style={{ fontSize: 10, fontFamily: 'monospace', color: '#9CA3AF', fontWeight: 700, margin: '0 0 6px' }}>COMPROBANTE</p>
+                <select value={editForm.tipo_comprobante} onChange={e => setEditForm(f => ({ ...f, tipo_comprobante: e.target.value }))}
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '2px solid #E5E7EB', fontSize: 15, outline: 'none' }}>
+                  <option value="FACTURA_LEGAL">🧾 Factura Legal</option>
+                  <option value="NOTA_VENTA">📄 Nota de Venta</option>
+                  <option value="SIN_DOCUMENTO">🚫 Sin documento</option>
+                </select>
+              </div>
+              <div>
+                <p style={{ fontSize: 10, fontFamily: 'monospace', color: '#9CA3AF', fontWeight: 700, margin: '0 0 6px' }}>PROYECTO</p>
+                <select value={editForm.proyecto_id} onChange={e => setEditForm(f => ({ ...f, proyecto_id: e.target.value, categoria_id: '' }))}
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '2px solid #E5E7EB', fontSize: 15, outline: 'none' }}>
+                  <option value="">Selecciona proyecto</option>
+                  {proyectos.map(p => <option key={p.id} value={p.id}>{PROYECTOS_CONFIG[p.nombre]?.emoji} {p.nombre}</option>)}
+                </select>
+              </div>
+              <div>
+                <p style={{ fontSize: 10, fontFamily: 'monospace', color: '#9CA3AF', fontWeight: 700, margin: '0 0 6px' }}>CATEGORÍA</p>
+                <select value={editForm.categoria_id} onChange={e => setEditForm(f => ({ ...f, categoria_id: e.target.value }))}
+                  disabled={!editForm.proyecto_id}
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '2px solid #E5E7EB', fontSize: 15, outline: 'none', opacity: editForm.proyecto_id ? 1 : 0.5 }}>
+                  <option value="">Selecciona categoría</option>
+                  {categorias.filter(c => c.proyecto_id === editForm.proyecto_id).map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+                </select>
+              </div>
+              <button onClick={handleGuardarEdit} disabled={guardandoEdit}
+                style={{ width: '100%', padding: '16px', borderRadius: 14, border: 'none', backgroundColor: '#2563EB', color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer', opacity: guardandoEdit ? 0.5 : 1 }}>
+                {guardandoEdit ? '⏳ Guardando...' : '💾 Guardar cambios'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
