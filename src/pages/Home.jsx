@@ -11,7 +11,6 @@ export default function Home() {
         <p style={{ fontSize: 56, margin: '0 0 6px' }}>💰</p>
         <h1 style={{ fontSize: 30, fontWeight: 900, color: '#fff', margin: 0, letterSpacing: '-0.02em' }}>Gasto Tracker</h1>
         <p style={{ fontSize: 11, color: "#6B7280", fontFamily: "monospace", margin: "4px 0 0", letterSpacing: "0.1em" }}>CONTROL FINANCIERO PERSONAL</p>
-        <button onClick={() => setAyuda(true)} style={{ marginTop: 12, backgroundColor: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 10, color: "#fff", fontSize: 13, padding: "6px 16px", cursor: "pointer" }}>❓ Ayuda</button>
         <div style={{ width: 40, height: 2, backgroundColor: '#F97316', borderRadius: 99, margin: '20px 0' }} />
 
         <div style={{ display: 'flex', gap: 12, width: '100%', maxWidth: 360, justifyContent: 'center' }}>
@@ -44,7 +43,8 @@ export default function Home() {
 
         </div>
 
-        <p style={{ fontSize: 11, color: '#374151', fontFamily: 'monospace', margin: '20px 0 0' }}>v1.0.0 · React + Supabase</p>
+        <button onClick={() => setAyuda(true)} style={{ marginTop: 16, backgroundColor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 12, color: '#9CA3AF', fontSize: 13, padding: '8px 24px', cursor: 'pointer', width: '100%', maxWidth: 360 }}>❓ Guía de uso</button>
+        <p style={{ fontSize: 11, color: '#374151', fontFamily: 'monospace', margin: '12px 0 0' }}>v1.0.0 · React + Supabase</p>
       </div>
 
       {/* FIRMA */}
