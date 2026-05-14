@@ -1,56 +1,58 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import Home from './pages/Home';
-import Captura from './pages/Captura';
-import Dashboard from './pages/Dashboard';
-import Historial from './pages/Historial';
-import Metas from './pages/Metas';
-import Reportes from './pages/Reportes';
-import AnalisisSRI from './pages/AnalisisSRI';
-import './App.css';
+import React from 'react'
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom'
+import Captura from './pages/Captura'
+import Dashboard from './pages/Dashboard'
+import Historial from './pages/Historial'
+import Metas from './pages/Metas'
+import Reportes from './pages/Reportes'
+import AnalisisSRI from './pages/AnalisisSRI'
+import './App.css'
+
+const NAV = [
+  { path: '/captura',   emoji: '📸', label: 'Captura'   },
+  { path: '/dashboard', emoji: '📊', label: 'Dashboard'  },
+  { path: '/historial', emoji: '📋', label: 'Historial'  },
+  { path: '/reportes',  emoji: '📄', label: 'Reportes'   },
+  { path: '/sri',       emoji: '🏛️', label: 'SRI'        },
+]
+
+function BottomNav() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  return (
+    <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, backgroundColor: '#111827', display: 'flex', borderTop: '1px solid #374151', zIndex: 99, paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      {NAV.map(item => {
+        const activo = location.pathname === item.path || (item.path === '/captura' && location.pathname === '/')
+        return (
+          <button key={item.path} onClick={() => navigate(item.path)}
+            style={{ flex: 1, padding: '10px 0 8px', border: 'none', backgroundColor: 'transparent', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+            <span style={{ fontSize: 22 }}>{item.emoji}</span>
+            <span style={{ fontSize: 9, fontWeight: 700, fontFamily: 'monospace', color: activo ? '#F97316' : '#6B7280', letterSpacing: '0.04em' }}>{item.label.toUpperCase()}</span>
+            {activo && <div style={{ width: 4, height: 4, borderRadius: '50%', backgroundColor: '#F97316' }} />}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
 
 function App() {
   return (
     <Router>
-      <div className="app">
-        <nav className="bg-gradient-to-r from-gray-700 to-gray-800 text-white px-4 py-4 shadow-md">
-          <div className="max-w-6xl mx-auto flex items-center justify-between">
-            <Link to="/" className="nav-logo">💰 Gasto Tracker</Link>
-            <div className="nav-links space-x-4 text-sm overflow-x-auto">
-              <Link to="/" className="text-gray-200 hover:text-white transition whitespace-nowrap">Home</Link>
-              <Link to="/captura" className="text-gray-200 hover:text-white transition whitespace-nowrap">Captura</Link>
-              <Link to="/dashboard" className="text-gray-200 hover:text-white transition whitespace-nowrap">Dashboard</Link>
-              <Link to="/historial" className="text-gray-200 hover:text-white transition whitespace-nowrap">Historial</Link>
-              <Link to="/metas" className="text-gray-200 hover:text-white transition whitespace-nowrap">Metas</Link>
-              <Link to="/reportes" className="text-gray-200 hover:text-white transition whitespace-nowrap">Reportes</Link>
-              <Link to="/sri" className="text-gray-200 hover:text-white transition whitespace-nowrap">SRI</Link>
-            </div>
-          </div>
-        </nav>
-
+      <div style={{ paddingBottom: 72 }}>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/captura" element={<Captura />} />
+          <Route path="/"          element={<Captura />} />
+          <Route path="/captura"   element={<Captura />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/historial" element={<Historial />} />
-          <Route path="/metas" element={<Metas />} />
-          <Route path="/reportes" element={<Reportes />} />
-          <Route path="/sri" element={<AnalisisSRI />} />
+          <Route path="/metas"     element={<Metas />} />
+          <Route path="/reportes"  element={<Reportes />} />
+          <Route path="/sri"       element={<AnalisisSRI />} />
         </Routes>
-
-        <footer className="app-footer bg-gray-800 text-gray-400 text-center py-6 mt-10 relative">
-          <div className="max-w-6xl mx-auto flex items-center justify-between px-4 mb-4">
-            <div className="flex-1 text-2xl">🔧 METALPAC</div>
-            <div className="flex-1 text-center">
-              <p className="text-sm">💰 Gasto Tracker v1.0.0</p>
-            </div>
-            <div className="flex-1 text-end text-2xl">🔥 ANTA</div>
-          </div>
-          <p className="text-xs text-gray-300 mt-3 text-center">Diseñado por Wilman Herrera Figueroa</p>
-        </footer>
+        <BottomNav />
       </div>
     </Router>
-  );
+  )
 }
 
 export default App
