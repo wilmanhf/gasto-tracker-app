@@ -90,10 +90,10 @@ export default function Historial() {
 
       {/* FILTRO PILLS */}
       <div style={{ display: 'flex', gap: 8, padding: '10px 12px', overflowX: 'auto', flexShrink: 0, scrollbarWidth: 'none' }}>
-        <button onClick={() => setFiltroProyecto("TODOS")} style={{...pillStyle(filtroProyecto === "TODOS", "#111827"), width: "auto"}}>📋 TODOS</button>
+        <button onClick={() => setFiltroProyecto("TODOS")} style={{...pillStyle(filtroProyecto === "TODOS", "#111827"), width: "auto"}}>📋 ALL</button>
         {Object.entries(PROYECTOS_CONFIG).map(([nombre, cfg]) => (
           <button key={nombre} onClick={() => setFiltroProyecto(nombre)} style={pillStyle(filtroProyecto === nombre, cfg.color)}>
-            {cfg.emoji} {nombre}
+            {cfg.emoji}
           </button>
         ))}
       </div>
