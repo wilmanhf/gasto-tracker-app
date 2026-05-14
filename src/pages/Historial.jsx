@@ -62,7 +62,7 @@ export default function Historial() {
   const totalFiltrado = filtradas.reduce((s, t) => s + parseFloat(t.monto || 0), 0)
 
   const pillStyle = (activo, color) => ({
-    flexShrink: 0, padding: '6px 14px', borderRadius: 99,
+    flexShrink: 0, padding: "6px 14px", borderRadius: 99, flexShrink: 0,
     border: `2px solid ${activo ? color : '#E5E7EB'}`,
     backgroundColor: activo ? color : '#fff',
     color: activo ? '#fff' : '#9CA3AF',
