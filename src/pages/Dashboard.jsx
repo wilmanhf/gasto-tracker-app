@@ -27,12 +27,22 @@ export default function Dashboard() {
       const resultado = {}
       for (const p of proyectos) {
         const txProy = txs.filter(t => t.proyecto_id === p.id)
+        const splitLineas = txs
+          .filter(t => t.es_split && Array.isArray(t.lineas))
+          .flatMap(t => t.lineas.filter(l => l.proyecto_id === p.id)
+            .map(l => ({ ...l, monto: parseFloat(l.monto || 0) })))
         const total = txProy.reduce((s, t) => s + parseFloat(t.monto || 0), 0)
+          + splitLineas.reduce((s, l) => s + l.monto, 0)
         const catMap = {}
         for (const t of txProy) {
           const cat = categorias.find(c => c.id === t.categoria_id)
           const nombre = cat?.nombre || 'Otros'
           catMap[nombre] = (catMap[nombre] || 0) + parseFloat(t.monto || 0)
+        }
+        for (const l of splitLineas) {
+          const cat = categorias.find(c => c.id === l.categoria_id)
+          const nombre = cat?.nombre || 'Otros'
+          catMap[nombre] = (catMap[nombre] || 0) + l.monto
         }
         const porCategoria = Object.entries(catMap)
           .map(([name, value]) => ({ name, value: parseFloat(value.toFixed(2)) }))
