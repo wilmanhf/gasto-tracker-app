@@ -18,6 +18,8 @@ export default function Metas() {
   const [cargando, setCargando] = useState(true)
   const [mostrarForm, setMostrarForm] = useState(false)
   const [guardando, setGuardando] = useState(false)
+  const [abonos, setAbonos] = useState({})
+
   const [form, setForm] = useState({
     nombre: '', descripcion: '', monto_objetivo: '',
     monto_actual: '0', proyecto_id: '', icono: '🎯',
@@ -120,7 +122,8 @@ export default function Metas() {
           const pct = objetivo > 0 ? Math.min((actual / objetivo) * 100, 100) : 0
           const completada = m.estado === 'completada' || pct >= 100
           const falta = Math.max(objetivo - actual, 0)
-          const [abonoInput, setAbonoInput] = useState('')
+          const abonoInput = abonos[m.id] || ''
+          const setAbonoInput = (v) => setAbonos(prev => ({ ...prev, [m.id]: v }))
 
           return (
             <div key={m.id} style={{ backgroundColor: '#fff', borderRadius: 16, padding: '16px', marginBottom: 10, border: `1.5px solid ${cfg.border}` }}>
