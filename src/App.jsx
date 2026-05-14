@@ -1,5 +1,6 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom'
+import Home from './pages/Home'
 import Captura from './pages/Captura'
 import Dashboard from './pages/Dashboard'
 import Historial from './pages/Historial'
@@ -9,6 +10,7 @@ import AnalisisSRI from './pages/AnalisisSRI'
 import './App.css'
 
 const NAV = [
+  { path: '/',          emoji: '🏠', label: 'Inicio'    },
   { path: '/captura',   emoji: '📸', label: 'Captura'   },
   { path: '/dashboard', emoji: '📊', label: 'Dashboard'  },
   { path: '/historial', emoji: '📋', label: 'Historial'  },
@@ -22,7 +24,7 @@ function BottomNav() {
   return (
     <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, backgroundColor: '#111827', display: 'flex', borderTop: '1px solid #374151', zIndex: 99, paddingBottom: 'env(safe-area-inset-bottom)' }}>
       {NAV.map(item => {
-        const activo = location.pathname === item.path || (item.path === '/captura' && location.pathname === '/')
+        const activo = location.pathname === item.path
         return (
           <button key={item.path} onClick={() => navigate(item.path)}
             style={{ flex: 1, padding: '10px 0 8px', border: 'none', backgroundColor: 'transparent', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
@@ -41,7 +43,7 @@ function App() {
     <Router>
       <div style={{ paddingBottom: 72 }}>
         <Routes>
-          <Route path="/"          element={<Captura />} />
+          <Route path="/"          element={<Home />} />
           <Route path="/captura"   element={<Captura />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/historial" element={<Historial />} />

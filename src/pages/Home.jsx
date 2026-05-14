@@ -1,87 +1,44 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react'
 
 export default function Home() {
-  const opciones = [
-    {
-      to: '/captura',
-      icon: '📸',
-      titulo: 'Capturar Gasto',
-      descripcion: 'Fotografía o manual',
-      color: 'bg-gray-700 hover:bg-gray-800'
-    },
-    {
-      to: '/dashboard',
-      icon: '📊',
-      titulo: 'Dashboard',
-      descripcion: 'Resumen financiero',
-      color: 'bg-orange-600 hover:bg-orange-700'
-    },
-    {
-      to: '/historial',
-      icon: '📋',
-      titulo: 'Historial',
-      descripcion: 'Transacciones',
-      color: 'bg-gray-500 hover:bg-gray-600'
-    },
-    {
-      to: '/metas',
-      icon: '💰',
-      titulo: 'Metas',
-      descripcion: 'Objetivos ahorro',
-      color: 'bg-orange-600 hover:bg-orange-700'
-    },
-    {
-      to: '/reportes',
-      icon: '📄',
-      titulo: 'Reportes',
-      descripcion: 'CSV / PDF',
-      color: 'bg-gray-700 hover:bg-gray-800'
-    },
-    {
-      to: '/sri',
-      icon: '🏛️',
-      titulo: 'Análisis SRI',
-      descripcion: 'Códigos tributarios',
-      color: 'bg-gray-500 hover:bg-gray-600'
-    }
-  ];
-
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <div className="max-w-4xl mx-auto">
-        
-        {/* HEADER */}
-        <div className="text-center mb-8 mt-4">
-          <div className="text-8xl mb-6">💰</div>
-          <h1 className="text-5xl font-bold text-gray-800">Gasto Tracker</h1>
-          <p className="text-gray-500 text-sm mt-2">Sistema de Inteligencia Financiera</p>
-        </div>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', backgroundColor: '#111827', overflow: 'hidden' }}>
 
-        {/* GRID 2x3 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          {opciones.map((opcion, idx) => (
-            <Link
-              key={idx}
-              to={opcion.to}
-              className={`${opcion.color} text-white rounded-lg p-4 transition transform hover:scale-105 active:scale-95 shadow-md flex items-center gap-3`}
-            >
-              <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center text-3xl">{opcion.icon}</div>
-              <div className="text-left min-w-0">
-                <h2 className="font-bold text-base leading-tight">{opcion.titulo}</h2>
-                <p className="text-sm text-gray-100">{opcion.descripcion}</p>
-              </div>
-            </Link>
+      {/* TOP — Logo y título */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 24px 20px' }}>
+        <p style={{ fontSize: 64, margin: '0 0 8px' }}>💰</p>
+        <h1 style={{ fontSize: 32, fontWeight: 900, color: '#fff', margin: 0, letterSpacing: '-0.02em', textAlign: 'center' }}>Gasto Tracker</h1>
+        <p style={{ fontSize: 13, color: '#6B7280', fontFamily: 'monospace', margin: '6px 0 0', letterSpacing: '0.1em' }}>CONTROL FINANCIERO PERSONAL</p>
+
+        {/* Línea separadora */}
+        <div style={{ width: 40, height: 2, backgroundColor: '#F97316', borderRadius: 99, margin: '24px 0' }} />
+
+        {/* Proyectos */}
+        <div style={{ display: 'flex', gap: 12, marginBottom: 32 }}>
+          {[
+            { emoji: '🔥', nombre: 'ANTA',     color: '#EA580C', bg: 'rgba(234,88,12,0.1)'  },
+            { emoji: '⚙️', nombre: 'METALPAC', color: '#2563EB', bg: 'rgba(37,99,235,0.1)'  },
+            { emoji: '🏠', nombre: 'CASA',     color: '#D97706', bg: 'rgba(217,119,6,0.1)'  },
+            { emoji: '👤', nombre: 'PERSONAL', color: '#059669', bg: 'rgba(5,150,105,0.1)'  },
+          ].map(p => (
+            <div key={p.nombre} style={{ flex: 1, backgroundColor: p.bg, borderRadius: 14, padding: '14px 8px', textAlign: 'center', border: `1px solid ${p.color}30` }}>
+              <p style={{ fontSize: 24, margin: 0 }}>{p.emoji}</p>
+              <p style={{ fontSize: 9, fontWeight: 800, color: p.color, margin: '6px 0 0', fontFamily: 'monospace', letterSpacing: '0.05em' }}>{p.nombre}</p>
+            </div>
           ))}
         </div>
 
-        {/* STATUS */}
-        <div className="bg-white rounded-lg p-4 text-center shadow-md border-t-4 border-orange-500">
-          <h3 className="text-gray-700 font-medium">✅ App Desplegada</h3>
-          <p className="text-gray-500 text-xs mt-1">Tu aplicación está VIVA en Vercel</p>
-          <p className="text-gray-400 text-xs mt-2">Versión: 1.0.0</p>
-        </div>
+        {/* Versión */}
+        <p style={{ fontSize: 11, color: '#374151', fontFamily: 'monospace', margin: 0 }}>v1.0.0 · React + Supabase</p>
       </div>
+
+      {/* BOTTOM — Firma */}
+      <div style={{ padding: '20px 24px 32px', borderTop: '1px solid #1F2937', textAlign: 'center' }}>
+        <p style={{ fontSize: 11, color: '#4B5563', fontFamily: 'monospace', margin: '0 0 4px', letterSpacing: '0.08em' }}>DISEÑADO Y DESARROLLADO POR</p>
+        <p style={{ fontSize: 18, fontWeight: 900, color: '#F97316', margin: 0, letterSpacing: '-0.01em' }}>Wilman Herrera Figueroa</p>
+        <p style={{ fontSize: 11, color: '#374151', fontFamily: 'monospace', margin: '4px 0 0' }}>Cuenca, Ecuador · 2026</p>
+      </div>
+
     </div>
-  );
+  )
 }
