@@ -89,11 +89,11 @@ export default function Historial() {
       </div>
 
       {/* FILTRO PILLS */}
-      <div style={{ display: 'flex', gap: 8, padding: '10px 12px', overflowX: 'auto', flexShrink: 0, scrollbarWidth: 'none' }}>
-        <button onClick={() => setFiltroProyecto("TODOS")} style={{...pillStyle(filtroProyecto === "TODOS", "#111827"), width: "auto"}}>📋 ALL</button>
-        {Object.entries(PROYECTOS_CONFIG).map(([nombre, cfg]) => (
-          <button key={nombre} onClick={() => setFiltroProyecto(nombre)} style={pillStyle(filtroProyecto === nombre, cfg.color)}>
-            {cfg.emoji}
+      <div style={{ display: 'flex', gap: 6, padding: '10px 12px', flexShrink: 0 }}>
+        {[{nombre:'TODOS', emoji:'📋', color:'#111827'}, ...Object.entries(PROYECTOS_CONFIG).map(([nombre,cfg])=>({nombre,...cfg}))].map(p => (
+          <button key={p.nombre} onClick={() => setFiltroProyecto(p.nombre)}
+            style={{ flex: 1, padding: '8px 0', borderRadius: 10, border: `2px solid ${filtroProyecto===p.nombre ? p.color : '#E5E7EB'}`, backgroundColor: filtroProyecto===p.nombre ? p.color : '#fff', color: filtroProyecto===p.nombre ? '#fff' : '#9CA3AF', fontSize: 16, cursor: 'pointer' }}>
+            {p.emoji}
           </button>
         ))}
       </div>
