@@ -8,6 +8,7 @@ import Metas from './pages/Metas'
 import Reportes from './pages/Reportes'
 import AnalisisSRI from './pages/AnalisisSRI'
 import './App.css'
+import SplashScreen from './components/SplashScreen'
 
 const NAV = [
   { path: '/',          emoji: '🏠', label: 'Inicio'    },
@@ -40,6 +41,8 @@ function BottomNav() {
 }
 
 function App() {
+  const [splash, setSplash] = React.useState(true)
+  if (splash) return <SplashScreen onDone={() => setSplash(false)} />
   return (
     <Router>
       <div style={{ paddingBottom: 72 }}>
