@@ -14,6 +14,7 @@ const NAV = [
   { path: '/captura',   emoji: '📸', label: 'Captura'   },
   { path: '/dashboard', emoji: '📊', label: 'Dashboard'  },
   { path: '/historial', emoji: '📋', label: 'Historial'  },
+  { path: '/metas',     emoji: '🎯', label: 'Metas'      },
   { path: '/reportes',  emoji: '📄', label: 'Reportes'   },
   { path: '/sri',       emoji: '🏛️', label: 'SRI'        },
 ]
