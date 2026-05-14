@@ -69,7 +69,7 @@ export default function Captura() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           <div>
             <label style={labelStyle}>Monto ($)</label>
-            <input type="text" inputMode="decimal" value={montoRaw} onChange={handleMonto} onBlur={handleMontoBlur} placeholder="0.00" style={{ ...inputStyle, fontSize: 32, fontWeight: 800, fontFamily: 'monospace', textAlign: 'right', color: montoRaw ? (montoError ? '#EF4444' : '#111827') : '#9CA3AF', border: montoError ? '2px solid #EF4444' : '2px solid #E5E7EB' }} />
+            <input type="text" inputMode="text" value={montoRaw} onChange={handleMonto} onBlur={handleMontoBlur} placeholder="0.00" style={{ ...inputStyle, fontSize: 32, fontWeight: 800, fontFamily: 'monospace', textAlign: 'right', color: montoRaw ? (montoError ? '#EF4444' : '#111827') : '#9CA3AF', border: montoError ? '2px solid #EF4444' : '2px solid #E5E7EB' }} />
             <p style={{ fontSize: 11, color: montoError ? '#EF4444' : '#9CA3AF', margin: '4px 0 0', fontFamily: 'monospace' }}>{montoError ? '❌ Expresión inválida' : 'Ej: 16.61 · También: 12.50+8.30'}</p>
           </div>
           <div>
