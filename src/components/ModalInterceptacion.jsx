@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../config/supabaseClient'
 const PROYECTO_CONFIG = {'CASA NUEVA': { emoji: '🏠', bg: '#F59E0B', bgLight: '#FFFBEB', border: '#FCD34D', text: '#92400E' },'METALPAC': { emoji: '⚙️', bg: '#2563EB', bgLight: '#EFF6FF', border: '#93C5FD', text: '#1E3A8A' },'ANTA': { emoji: '🔥', bg: '#EA580C', bgLight: '#FFF7ED', border: '#FDBA74', text: '#9A3412' },'PERSONAL': { emoji: '👤', bg: '#059669', bgLight: '#ECFDF5', border: '#6EE7B7', text: '#065F46' },}
-const PASOS = { PROYECTO: 1, CATEGORIA: 2, TIPO_LINEA: 3, SPLIT: 4, CONFIRMACION: 5 }
-const PASO_LABELS = { 1: '¿A qué proyecto?', 2: '¿Qué categoría?', 3: '¿Cómo registrar?', 4: 'Dividir entre líneas', 5: 'Confirmar registro' }
+const PASOS = { PROYECTO: 1, CATEGORIA: 2, TIPO_LINEA: 3, SPLIT: 4, CONFIRMACION: 5, FONDO: 6 }
+const PASO_LABELS = { 1: '¿A qué proyecto?', 2: '¿Qué categoría?', 3: '¿Cómo registrar?', 4: 'Dividir entre líneas', 5: 'Confirmar registro', 6: '¿Usar fondo de ahorro?' }
 export default function ModalInterceptacion({ transaccion, onConfirm, onClose }) {
   const [paso, setPaso] = useState(PASOS.PROYECTO)
   const [proyectos, setProyectos] = useState([])
@@ -13,6 +13,8 @@ export default function ModalInterceptacion({ transaccion, onConfirm, onClose })
   const [esSplit, setEsSplit] = useState(false)
   const [lineas, setLineas] = useState([])
   const [guardando, setGuardando] = useState(false)
+  const [metas, setMetas] = useState([])
+  const [metaSel, setMetaSel] = useState(null)
   const [error, setError] = useState(null)
   const [nuevaLinea, setNuevaLinea] = useState({ monto: '', proyecto_id: '', categoria_id: '', categoriasCarga: [] })
   const montoTotal = parseFloat(transaccion?.monto || 0)
@@ -28,8 +30,12 @@ export default function ModalInterceptacion({ transaccion, onConfirm, onClose })
     if (!proyectoSel) return
     const fetch = async () => {
       setCargandoCategorias(true)
-      const { data } = await supabase.from('categorias').select('id, nombre').eq('proyecto_id', proyectoSel.id).order('nombre')
-      setCategorias(data || [])
+      const [{ data: cats }, { data: mts }] = await Promise.all([
+        supabase.from('categorias').select('id, nombre').eq('proyecto_id', proyectoSel.id).order('nombre'),
+        supabase.from('metas_ahorro').select('*').eq('proyecto_id', proyectoSel.id).eq('estado', 'activa')
+      ])
+      setCategorias(cats || [])
+      setMetas((mts || []).filter(m => parseFloat(m.monto_actual) > 0))
       setCargandoCategorias(false)
     }
     fetch()
@@ -65,7 +71,7 @@ export default function ModalInterceptacion({ transaccion, onConfirm, onClose })
   const eliminarLinea = (idx) => {
     setLineas(lineas.filter((_, i) => i !== idx))
   }
-  const handleConfirmar = async () => {
+  const handleConfirmar = async (metaId) => {
     setGuardando(true)
     setError(null)
     try {
@@ -89,6 +95,14 @@ export default function ModalInterceptacion({ transaccion, onConfirm, onClose })
         lineas: esSplit ? lineas : [],
       }
       await onConfirm(payload)
+      if (metaId) {
+        const meta = metas.find(m => m.id === metaId)
+        if (meta) {
+          const nuevo = Math.max(parseFloat(meta.monto_actual) - montoTotal, 0)
+          const estado = nuevo <= 0 ? 'completada' : 'activa'
+          await supabase.from('metas_ahorro').update({ monto_actual: nuevo, estado }).eq('id', metaId)
+        }
+      }
     } catch (err) {
       setError(err.message || 'Error al guardar')
       setGuardando(false)
@@ -192,6 +206,24 @@ export default function ModalInterceptacion({ transaccion, onConfirm, onClose })
               </div>
             </div>
           </div>)}
+          {paso === PASOS.FONDO && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 8px' }}>Tienes fondos de ahorro en este proyecto. ¿Quieres usar alguno para cubrir este gasto?</p>
+              {metas.map(m => (
+                <button key={m.id} onClick={() => handleConfirmar(m.id)}
+                  style={{ padding: 16, borderRadius: 16, border: `2px solid ${config?.border}`, backgroundColor: config?.bgLight, cursor: 'pointer', textAlign: 'left', width: '100%' }}>
+                  <p style={{ fontWeight: 700, color: config?.text, margin: 0 }}>{m.icono || '🎯'} {m.nombre}</p>
+                  <p style={{ fontSize: 12, color: '#9CA3AF', margin: '4px 0 0' }}>
+                    Disponible: ${parseFloat(m.monto_actual).toFixed(2)} · Objetivo: ${parseFloat(m.monto_objetivo).toFixed(2)}
+                  </p>
+                </button>
+              ))}
+              <button onClick={() => handleConfirmar(null)}
+                style={{ padding: 14, borderRadius: 16, border: '2px solid #E5E7EB', backgroundColor: '#F9FAFB', cursor: 'pointer', color: '#6B7280', fontWeight: 600, fontSize: 14 }}>
+                No usar fondo de ahorro
+              </button>
+            </div>
+          )}
           {paso === PASOS.CONFIRMACION && (<div>
             <div style={{ borderRadius: 16, padding: 16, backgroundColor: config?.bgLight, border: `2px solid ${config?.border}`, marginBottom: 20 }}>
               {!esSplit ? (
@@ -226,7 +258,7 @@ export default function ModalInterceptacion({ transaccion, onConfirm, onClose })
               </div>
             </div>
             {error && <div style={{ padding: '10px', borderRadius: 10, marginBottom: 12, backgroundColor: '#FEF2F2', color: '#B91C1C', fontSize: 13 }}>❌ {error}</div>}
-            <button style={{ width: '100%', padding: 16, borderRadius: 16, border: 'none', fontSize: 16, fontWeight: 700, color: 'white', cursor: 'pointer', backgroundColor: config?.bg, opacity: guardando ? 0.5 : 1 }} onClick={handleConfirmar} disabled={guardando}>
+            <button style={{ width: '100%', padding: 16, borderRadius: 16, border: 'none', fontSize: 16, fontWeight: 700, color: 'white', cursor: 'pointer', backgroundColor: config?.bg, opacity: guardando ? 0.5 : 1 }} onClick={() => metas.length > 0 ? setPaso(PASOS.FONDO) : handleConfirmar(null)} disabled={guardando}>
               {guardando ? '⏳ Guardando...' : '✅ Registrar'}
             </button>
           </div>)}
