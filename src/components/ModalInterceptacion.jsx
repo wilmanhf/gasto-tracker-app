@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
+import { supabase } from '../config/supabaseClient'
 const PROYECTO_CONFIG = {'CASA NUEVA': { emoji: '🏠', bg: '#F59E0B', bgLight: '#FFFBEB', border: '#FCD34D', text: '#92400E' },'METALPAC': { emoji: '⚙️', bg: '#2563EB', bgLight: '#EFF6FF', border: '#93C5FD', text: '#1E3A8A' },'ANTA': { emoji: '🔥', bg: '#EA580C', bgLight: '#FFF7ED', border: '#FDBA74', text: '#9A3412' },'PERSONAL': { emoji: '👤', bg: '#059669', bgLight: '#ECFDF5', border: '#6EE7B7', text: '#065F46' },}
 const PASOS = { PROYECTO: 1, CATEGORIA: 2, TIPO_LINEA: 3, SPLIT: 4, CONFIRMACION: 5 }
 const PASO_LABELS = { 1: '¿A qué proyecto?', 2: '¿Qué categoría?', 3: '¿Cómo registrar?', 4: 'Dividir entre líneas', 5: 'Confirmar registro' }
