@@ -159,7 +159,7 @@ export default function Historial() {
                 </div>
               </div>
               {/* Contenido */}
-              <div style={{ overflow: 'auto', flex: 1, padding: '16px 20px 32px' }}>
+              <div style={{ overflow: 'auto', flex: 1, padding: "16px 20px 120px" }}>
 
                 {/* Campos comunes */}
                 {[
